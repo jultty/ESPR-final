@@ -1,0 +1,2697 @@
+---
+title: "Trabalho Final"
+subtitle: "Estatística e Probabilidade"
+author: "Juno Takano"
+date: "2025-06-30"
+lang: pt-BR
+theme:
+  light: lux
+  dark: darkly
+format:
+  html:
+    respect-user-color-scheme: true
+    toc: true
+    anchor-sections: true
+    smooth-scroll: true
+execute:
+  cache: true
+---
+
+## Introdução
+
+Este trabalho foi elaborado para a disciplina de Estatística e Probabilidade, sob orientação do Prof. Dr. Cleverson Pinheiro, como parte curso de Análise e Desenvolvimento de Sistemas do Instituto Federal de São Paulo, Campus Jacareí. Ele foi desenvolvido utilizando a linguagem de programação [R](https://r-project.org/), a ferramenta de publicação [Quarto](https://quarto.org/) e o conjunto de pacotes [tidyverse](https://tidyverse.org/).
+
+O código fonte correspondente a este documento está também disponível no GitHub, no repositório [jultty/ESPR-final](https://github.com/jultty/ESPR-final). Ele pode ser visualizado em sua versão como página _web_ em [jultty.github.io/ESPR-final](https://jultty.github.io/ESPR-final).
+
+- Softwares utilizados e versões:
+  - R 4.2.2, de 10 de novembro de 2022
+  - Quarto 1.7.32, de 16 de junho de 2025
+  - tidyverse 2.0.0, de 22 de fevereiro de 2023, com atualizações de pacotes individuais
+
+Os pacotes utilizados podem ser visualizadas na relação abaixo, onde são de fato carregados no ambiente de desenvolvimento.
+
+```{r}
+#| warning: false
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(scales)
+```
+
+Blocos de código como o exibido acima são utilizados ao longo deste documento. Em algumas ocasiões, eles estão ocultos por terem menor importância para a demonstração da solução -- por exemplo, código relacionado estritamente à plotagem de gráficos e não à definição de um cálculo ou algoritmo que de fato informa o gráfico.
+
+Nestes casos, o texto "⯈ Código" aparece onde o código está oculto e apenas seu resultado é exibido, seja ele um número, texto, conjunto de dados ou gráfico. Clicando sobre este texto, é possível expandir e visualizar o código na íntegra:
+
+```{r}
+#| code-fold: true
+
+exp(1i * pi) + 1
+```
+
+### Observações
+
+Para manter a consistência com as saídas computacionais, neste trabalho utilizou-se exclusivamente o ponto como marcador de casas decimais.
+
+## Funções Utilitárias
+
+Primeiro, podemos definir algumas funções auxiliares que serão úteis ao longo de todo o trabalho.
+
+```{r}
+## Usando notação Latex, mostra um número com seis casas decimais e
+## a porcentagem equivalente com duas casas decimais
+ppercent <- function(raw) {
+  sprintf("$$P = %.6f \\approx %.2f\\%%$$", raw, raw * 100) |> cat()
+}
+
+## Arredonda um número para 4 casas decimais
+r4 <- function(float) {
+  round(float, digits = 4)
+}
+
+## Arredonda um número para 2 casas decimais
+r2 <- function(float) {
+  round(float, digits = 2)
+}
+```
+
+## Exercício 1
+
+Dada a oportunidade na questão elementar do primeiro exercício, podemos representar as curvas $A$, $B$ e $C$ usando valores aproximados ao que vemos no gráfico, demonstrando a estabelecendo alguns padrões que se repetirão ao longo deste trabalho.
+
+Para isso, criaremos uma _[tibble](https://tibble.tidyverse.org/)_, uma estrutura de dados similar a um _dataframe_, que armazena dados em formato tabular. Desta forma podemos relacionar cada curva à sua média e desvio padrão.
+
+```{r}
+curves <- tibble(
+  curve = c("A", "B", "C"), # Curva
+  mu = c(45, 60, 45),       # Média
+  sigma = c(2, 3.5, 5),     # Desvio padrão
+)
+```
+
+Iremos construir também um vetor `x_vector` para os valores de $x$ contendo 1000 valores entre 0 e 100.
+
+```{r}
+x_vector <- seq(0, 100, length.out = 1000)
+```
+
+Neste momento, temos as informações necessárias para obter os valores correspondentes no eixo $y$.
+
+Criaremos uma segunda _tibble_, `density`, que terá 3000 linhas, mil para cada curva, com respectivos $x$ e $y$. Embora mais didático pelo menor nível de abstração, esta implementação  não seria seria preferível em larga escala, onde o pacote [purrr](https://purrr.tidyverse.org/index.html) oferece resultados mais eficientes.
+
+```{r}
+density <- curves |>
+  # Para estruturar o dataset, repetimos os atributos de cada curva 1000 vezes
+  slice(rep(seq_len(n()), each = length(x_vector))) |>
+  # Adicionamos uma nova coluna, que insere os valores de x para cada linha
+  mutate(x = rep(x_vector, times = nrow(curves))) |>
+  # Finalmente, obtemos o y correspondente na FDP em outra nova coluna
+  mutate(y = dnorm(x, mean = mu, sd = sigma)) |>
+  # Precisamos apenas das colunas curve (A, B ou C), x e y
+  select(curve, x, y)
+```
+
+O resultado do que estabelecemos acima pode ser observado na plotagem dos dados:
+
+```{r}
+#| code-fold: true
+
+## Define as posições dos rótulos sobre cada curva
+## A partir do ponto máximo de cada curva, calculamos uma posição um pouco mais
+## à esquerda e abaixo para posicionar os rótulos
+label_positions <- curves |>
+  transmute(curve,
+    x = mu - 7,
+    y = dnorm(mu, mean = mu, sd = sigma) - 0.01
+  )
+
+## Plota os dados
+plot <- ggplot(density, aes(x, y, color = curve)) +
+  geom_line(linewidth = 1, show.legend = FALSE) +
+  geom_text(
+    data = label_positions, aes(x = x, y = y, label = curve),
+    size = 6,
+    show.legend = FALSE,
+  ) +
+  labs(
+    title = "Esboço das Curvas Normais A, B e C",
+    x = "", y = "",
+  ) +
+  scale_x_continuous(
+    breaks = seq(0, 100, by = 10),
+    minor_breaks = seq(0, 100, by = 5)
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(margin = margin(l = -25, t = 10, b = 15))
+  )
+
+plot
+```
+
+Munidos do gráfico, podemos responder às perguntas do enunciado:
+
+### Questão A
+
+A média maior é a da curva $B$, pois ela está mais deslocada à direita. Sua média fica sobre o ponto $60$ do eixo $x$.
+
+```{r}
+#| code-fold: true
+
+bisectors <- curves |>
+  transmute(curve, xintercept = mu)
+
+plot +
+  labs(
+    title = "Esboço das Curvas Normais A, B e C com linhas de simetria",
+  ) +
+  geom_vline(
+    data = bisectors,
+    aes(xintercept = xintercept),
+    color = "#66666666",
+    linetype = "dashed",
+    linewidth = 0.6,
+    show.legend = FALSE
+  )
+```
+
+As linhas de simetria nos ajudam a verificar que a média maior está localizada no ponto 60 do eixo $x$, a média da curva $B$. Não há diferença significativa entre os eixos de simetria das curvas $A$ e $C$, ambas com aparente média 45, mas visivelmente à esquerda da média de $B$.
+
+### Questão B
+
+O desvio padrão maior é o da curva $C$, pois seus limites mínimo e máximo atingem um desvio muito mais amplo em relação à média. Isso também indica que o desvio padrão de $C$ deve ser o maior. Observando o esboço, podemos estimar um desvio padrão em torno de $5$.
+
+## Exercício 2
+
+O exercício 2 nos apresenta um problema similar, que também se debruça sobre a observação de um esboço. Sabendo que a criação de curvas normais será essencial por todo o trabalho, vamos criar um par de funções que nos permita esboçar curvas normais como a que criamos anteriormente através apenas de seus parâmetros:
+
+```{r}
+#| code-fold: true
+
+## Plota o gráfico de uma curva de distribuição normal
+plot_draft <- function(density, curve, properties) {
+  p <- properties
+  mu <- slice_head(curve)$mu
+  sigma <- slice_head(curve)$sigma
+
+  bisectors <- curve |>
+    transmute(curve, xintercept = mu)
+
+  plot <- ggplot(density, aes(x, y)) +
+
+    geom_line(color = "#00af00", linewidth = 1, show.legend = FALSE) +
+    geom_vline(
+      data = bisectors,
+      aes(xintercept = xintercept),
+      color = "#66666666",
+      linetype = "dashed",
+      linewidth = 0.6,
+      show.legend = FALSE
+    ) +
+    annotate(
+     "text",
+      x    = mu,
+      y    = dnorm(mu, mean = mu, sd = sigma) * 0.25,
+      label = paste0("μ = ", mu),
+      vjust = 0,
+      hjust = -0.25,
+      color = "darkgreen"
+    ) +
+    labs(
+      title = paste("Esboço da Curva Normal \"", p$name, "\"", sep = ""),
+      x = "",
+      y = ""
+    ) +
+    scale_x_continuous(
+      breaks = seq(p$x_min, p$x_max, by = p$x_step),
+      minor_breaks = seq(p$x_min, p$x_max, by = p$x_step / 2),
+      labels = label_number(accuracy = 0.1),
+    ) +
+    scale_y_continuous(
+      limits = c(0, max(density$y) * p$y_max_multiplier)
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(plot.title = element_text(margin = margin(l = -25, t = 10, b = 15)))
+
+  plot
+}
+```
+
+```{r}
+
+draft <- function(name, mu, sigma, x_min, x_max, x_step, y_max_multiplier = 1) {
+
+    curve <- tibble(
+      curve = name,
+      mu = mu,
+      sigma = sigma,
+    )
+
+    x_vector <- seq(x_min, x_max, length.out = 1000)
+
+    density <- curve |>
+      slice(rep(seq_len(n()), each = length(x_vector))) |>
+      mutate(x = x_vector) |>
+      mutate(y = dnorm(x, mean = mu, sd = sigma)) |>
+      select(curve, x, y)
+
+    graph_properties <- list(
+      name = name,
+      x_min = x_min,
+      x_max = x_max,
+      x_step = x_step,
+      y_max_multiplier = y_max_multiplier
+    )
+
+    plot_draft(density, curve, graph_properties)
+  }
+```
+
+Nossa função pode ser usada da seguinte forma:
+
+```{r}
+draft(
+  name = "Notas",
+  mu = 655,
+  sigma = 25,
+  x_min = 580,
+  x_max = 730,
+  x_step = 20,
+  y_max_multiplier = 1.8
+)
+```
+
+Podemos responder, pela observação do gráfico, que a **nota média** é de 655.
+
+Ainda observando o gráfico, podemos ver aproximadamente os pontos de inflexão em 630 e 680, o que sugere um desvio padrão de $\sigma = 25$.
+
+## Exercício 3
+
+Os exercícios 3 a 6 apresentam problemas relacionados à área sob a curva normal padrão dado um escore-z.
+
+A linguagem R já nos fornece a função [`pnorm`](https://search.r-project.org/R/refmans/stats/html/Normal.html), que responde de forma direta à pergunta sobre qual é a área sob a curva dado um $z$ qualquer.
+
+Para visualizarmos estas informações, iremos criar uma função `z_plot` para obter ainda um gráfico representando a área.
+
+Nossa função receberá apenas um valor `z` e dois parâmetros opcionais:
+
+- `right`, que, se fornecido com o valor `TRUE`, retornará um gráfico com a aŕea à direita de $z$. Caso o valor seja `FALSE` ou não seja fornecido, ela por padrão retornará um gráfico com a área à esquerda de $z$
+- `opposite`, que, se fornecido, representa um segundo valor oposto ao primeiro que delimita o fim da área, ou seja, permite encontrar uma região entre dois valores
+
+```{r}
+#| code-fold: true
+
+z_plot <- function(z, right = FALSE, opposite = NULL) {
+
+opp <- if (is.null(opposite)) if (right) 4 else -4 else opposite
+
+## Cria um conjunto de 400 valores para x entre -4 e 4
+x_vals <- seq(-4, 4, length.out = 400)
+
+## Cria uma tibble com os valores de x e seus equivalentes em y
+pairs <- tibble(x = x_vals, y = dnorm(x_vals))
+
+plot <- ggplot(
+  # Traça a curva usando os valores de x e y
+  pairs, aes(x, y)) +
+  geom_line(linewidth = 0.5, color = "#0000006f") +
+  geom_area(
+    # Obtém apenas a área onde x <= z
+    data = subset(pairs, if (right) (x >= z & x <= opp) else (x >= opp & x <= z)),
+    aes(x, y),
+    # Colore a área obtida em verde
+    fill = "darkgreen", alpha = 0.4
+  ) +
+  # Traça uma linha perpendicular a x sobre z
+  geom_vline(xintercept = z, linetype = "dashed", color = "darkgreen") +
+    labs(
+      x = "z",
+      y = "Densidade de probabilidade"
+    ) +
+  # Demais parâmetros para a aparência e tamanho do gráfico
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(margin = margin(l = -45, t = 10, b = 25)),
+    axis.title.y = element_text(
+      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = "pt")
+    ),
+    axis.title.x = element_text(
+      margin = margin(t = 15, r = 0, b = 10, l = 0, unit = "pt")
+    )
+  )
+
+  plot <- if (!is.null(opposite)) {
+    plot +
+      # Adiciona título e rótulos dos eixos
+      labs(
+        title = paste("Área entre os escores-z", r4(z), "e", r4(opp)),
+      ) +
+      geom_vline(
+        xintercept = opp,
+        linetype = "dashed",
+        color = "darkgreen"
+      ) +
+      annotate(
+        "text",
+        x = z, y = dnorm(z) * 0.5,
+        label = sprintf("%.3f", z),
+        size = 3,
+        vjust = -0.4,
+        hjust = -0.1,
+        color = "darkgreen"
+      ) +
+      annotate(
+        "text",
+        x = opp, y = dnorm(opp) * 0.5,
+        label = sprintf("%.3f", opp),
+        size = 3,
+        vjust = -0.4,
+        hjust = -0.1,
+        color = "darkgreen"
+      ) +
+      annotate(
+        "text",
+        x = 0.5, y = dnorm(0),
+        label = sprintf(
+          "P(%.2f ≤ z ≤ %.2f) = %.4f",
+          if (z < opp) z else opp,
+          if (z > opp) z else opp,
+          abs(pnorm(z) - pnorm(opp))
+        ),
+        size = 3,
+        vjust = -0.4,
+        hjust = -0.1,
+        color = "darkgreen"
+    )
+  } else {
+    plot +
+    # Adiciona título e rótulos dos eixos
+    labs(
+      title = paste("Área acumulada para o escore-z", r4(z)),
+    ) +
+    # Anota o valor correspondente à área
+    annotate(
+      "text",
+      x = z, y = dnorm(z) * 0.5,
+      label = sprintf("P(z ≤ %.2f) = %.4f", z, pnorm(z, lower.tail = !right)),
+      size = 3,
+      vjust = -0.4,
+      hjust = -0.1,
+      color = "darkgreen"
+    )
+  }
+  plot
+}
+```
+
+### Questão A
+
+A função `pnorm` responde à pergunta sobre a área acumulada sob a curva normal padrão à esquerda de $-2.19$, que é igual a $0.01426212$ ou aproximadamente $1.43\%$.
+
+```{r}
+#| output: asis
+pnorm(-2.19) |> ppercent()
+```
+
+Podemos também representar esta área visualmente usando a função `z_plot` que acabamos de definir:
+
+```{r}
+z_plot(-2.19)
+```
+
+### Questão B
+
+Para 2.17, temos:
+
+```{r}
+#| output: asis
+pnorm(2.17) |> ppercent()
+```
+
+Que pode ser representado como:
+
+```{r}
+z_plot(2.17)
+```
+
+## Exercício 4
+
+### Questão A
+
+```{r}
+z_plot(2.13)
+```
+
+### Questão B
+
+```{r}
+#| output: asis
+pnorm(2.13) |> ppercent()
+```
+
+## Exercício 5
+
+### Questão A
+
+Para encontrar a área à direita de um determinado ponto podemos subtrair o mesmo resultado obtido com `pnorm` de 1:
+
+```{r}
+1 - pnorm(-2.16)
+```
+
+Ou podemos usar a opção `lower.tail = FALSE`, fornecida pela própria função:
+
+```{r}
+#| output: asis
+pnorm(-2.16, lower.tail = FALSE) |> ppercent()
+```
+
+A curva normal padrão com a área sob a curva à direita de $z = -2.16$ também pode ser obtida com a função que definimos, `z_plot`. Desta vez usamos o parâmetro opcional `right` com o valor `TRUE`, o que retorna o gráfico com a área à direita de $z$ em destaque:
+
+```{r}
+z_plot(-2.16, right = TRUE)
+```
+
+### Questão B
+
+```{r}
+#| output: asis
+pnorm(-2.16) |> ppercent()
+```
+
+### Questão C
+
+```{r}
+1 - pnorm(-2.16)
+```
+
+## Exercício 6
+
+No exercício 6, precisamos encontrar a área _entre_ $z = -2.165$ e $z = -1.35$, isto é:
+
+$$
+  P(-2.165 < z < -1.35)
+$$
+
+### Questão A
+
+```{r}
+z_plot(-2.165, right = TRUE, opposite = -1.35)
+```
+
+### Questão B
+
+```{r}
+pnorm(-1.35)
+```
+
+### Questão C
+
+```{r}
+pnorm(-2.165)
+```
+
+### Questão D
+
+```{r}
+pnorm(-1.35) - pnorm(-2.165)
+```
+
+### Questão E
+
+Seja $P$ a função de distribuição acumulada,
+
+$$ z_1 = -2.165 $$
+$$ z_2 = -1.35 $$
+$$ \because \; z_1 < z_2 \; \therefore \; P(z_1 < z < z_2) = P(z_2) - P(z_1) $$
+
+$$ P(z_1) = `r pnorm(-2.165)` $$
+$$ P(z_2) = `r pnorm(-1.35)` $$
+$$ P = `r pnorm(-1.35)` - `r pnorm(-2.165)` $$
+
+```{r}
+#| output: asis
+#| echo: false
+(pnorm(-1.35) - pnorm(-2.165)) |> ppercent()
+```
+
+**Interpretação:** A probabilidade de que a média encontre-se entre $-2.165$ e
+$-1.35$ é de aproximadamente
+$`r round((pnorm(-1.35) - pnorm(-2.165)) * 100, digits = 2)`\%$.
+
+## Exercício 7
+
+$$ \mu = 67 $$
+$$ \sigma = 3.5 $$
+$$ S = P( x > 70) $$
+
+Podemos agregar estes valores em uma lista para acesso posterior:
+
+```{r}
+e7 <- list(
+  mu = 67,
+  sigma = 3.5,
+  x = 70
+)
+
+```
+
+### Questão A
+
+```{r}
+draft(
+  name = "Velocidade",
+  mu = e7$mu,
+  sigma = e7$sigma,
+  x_min = e7$mu - e7$sigma * 3.5,
+  x_max = e7$mu + e7$sigma * 3.5,
+  x_step = ceiling(e7$sigma / 2),
+)
+```
+
+### Questão B
+
+```{r}
+
+z <- (e7$x - e7$mu) / e7$sigma
+z
+```
+
+### Questão C
+
+```{r}
+#| output: asis
+(1 - pnorm(z)) |> ppercent()
+```
+
+```{r}
+z_plot(z, right = TRUE)
+```
+
+### Questão D
+
+**Interpretação**: A probabilidade de que um veículo aleatório ultrapasse a
+velocidade máxima de 70 milhas por hora é de aproximadamente
+$`r round((pnorm(-1.35) - pnorm(-2.165)) * 100, digits = 2)`\%$.
+
+## Exercício 8
+
+$$ \mu = 45 $$
+$$ \sigma = 12 $$
+$$ S = P(33 ≤ x ≤ 60) $$
+
+```{r}
+e8 <- list(
+  mu = 45,
+  sigma = 12,
+  x1 = 33,
+  x2 = 60
+)
+
+```
+
+### Questão A
+
+```{r}
+draft(
+  name = "Permanência",
+  mu = e8$mu,
+  sigma = e8$sigma,
+  x_min = e8$mu - e8$sigma * 3.5,
+  x_max = e8$mu + e8$sigma * 3.5,
+  x_step = ceiling(e8$sigma / 2),
+)
+```
+
+### Questão B
+
+```{r}
+
+z1 <- (e8$x1 - e8$mu) / e8$sigma
+z1
+```
+
+```{r}
+
+z2 <- (e8$x2 - e8$mu) / e8$sigma
+z2
+```
+
+### Questão C
+
+```{r}
+#| output: asis
+p <- abs(pnorm(z2) - pnorm(z1))
+p |> ppercent()
+```
+
+```{r}
+z_plot(z2, opposite = z1)
+```
+
+### Questão D
+
+**Interpretação**: A probabilidade $p$ de que um consumidor fique na loja entre 33 e 60 minutos é de aproximadamente $`r round(p, digits = 6)`$, ou $`r round(p * 100, digits = 2)`\%$. Para 150 consumidores aleatórios, espera-se que aproximadamente $150 \cdot p = `r ceiling(150 * p)`$ consumidores permaneceriam na loja entre 33 e 60 minutos.
+
+## Exercício 9
+
+Não há informação suficiente no enunciado para obter a probabilidade de que este evento ocorra.
+
+## Exercício 10
+
+### Questão 10.1
+
+A função `qnorm` pode fornecer um escore-z correspondente a uma dada probabilidade.
+
+```{r}
+z <- qnorm(0.9616)
+z
+```
+
+### Questão 10.2
+
+Seja $\alpha$ o valor restante, de $0.05$, podemos obter o escore-z da diferença entre 1 e $\alpha \over 2$:
+
+```{r}
+alpha <- 0.05
+z95 <- qnorm(1 - alpha/2)
+z95
+```
+
+### Questão 10.2 A
+
+```{r}
+pnorm(z95)
+```
+
+A área acumulada é de `r pnorm(z95)`.
+
+### Questão 10.2 B
+
+```{r}
+qnorm(pnorm(z95))
+```
+
+A área corresponde a `r qnorm(pnorm(z95))` na tabela padrão.
+
+### Questão 10.2 C
+
+O escore-z correspondente é `qnorm(1 - alpha/2)` , $`r qnorm(1 - alpha/2)`$.
+
+## Exercício 11
+
+### Questões A a C
+
+Podemos obter cada percentil pela porcentagem ainda através da função `qnorm`.
+
+```{r}
+p10 <- qnorm(0.1)
+p20 <- qnorm(0.2)
+p99 <- qnorm(0.99)
+
+p10
+p20
+p99
+```
+
+Temos, portanto:
+
+$$ P_{10} = `r p10` $$
+$$ P_{20} = `r p20` $$
+$$ P_{99} = `r p99` $$
+
+## Exercício 12
+
+$$ \mu = 52 $$
+$$ \sigma = 15 $$
+
+### Questão A
+
+```{r}
+e12 <- list(
+  mu = 52,
+  sigma = 15,
+  x1 = NULL,
+  x2 = NULL,
+  x2 = NULL,
+  z1 = -2.33,
+  z2 = 3.1,
+  z3 = 0.58
+)
+
+```
+
+```{r}
+#| code-fold: true
+draft(
+  name = "Pesos",
+  mu = e12$mu,
+  sigma = e12$sigma,
+  x_min = e12$mu - e12$sigma * 3.5,
+  x_max = e12$mu + e12$sigma * 3.5,
+  x_step = ceiling(e12$sigma / 2),
+)
+```
+
+### Questão B
+
+Podemos inverter a fórmula para obter um escore-z e teremos:
+
+$$
+x = \mu + \sigma \cdot z
+$$
+
+Portanto, para cada $z_n$ em $\{ `r e12$z1`, `r e12$z2`, `r e12$z3` \}$, podemos obter um $x_n$:
+
+```{r}
+e12$x1 <- e12$mu + e12$sigma * e12$z1
+e12$x1
+
+e12$x2 <- e12$mu + e12$sigma * e12$z2
+e12$x2
+
+e12$x3 <- e12$mu + e12$sigma * e12$z3
+e12$x3
+```
+
+### Questão C
+
+Os pesos correspondentes são:
+
+$$ z_1 = `r e12$z1` \rightarrow x_1 = `r e12$x1` $$
+$$ z_2 = `r e12$z2` \rightarrow x_2 = `r e12$x2` $$
+$$ z_3 = `r e12$z3` \rightarrow x_3 = `r e12$x3` $$
+
+## Exercício 13
+
+$$ \mu = 129 $$
+$$ \sigma = 5.18 $$
+
+### Questão A
+
+```{r}
+e13 <- list(
+  mu = 129,
+  sigma = 5.18,
+  x = NULL,
+  z = NULL
+)
+
+```
+
+```{r}
+#| code-fold: true
+draft(
+  name = "Frenagem",
+  mu = e13$mu,
+  sigma = e13$sigma,
+  x_min = e13$mu - e13$sigma * 3.5,
+  x_max = e13$mu + e13$sigma * 3.5,
+  x_step = ceiling(e13$sigma),
+)
+```
+
+### Questão B
+
+Podemos encontrar o escore-z para $0.01$ também com a função `qnorm`:
+
+```{r}
+e13$z <- qnorm(0.01)
+e13$z
+```
+
+```{r}
+z_plot(e13$z)
+```
+
+### Questão C
+
+Mais uma vez, podemos usar:
+
+$$ x = \mu + \sigma \cdot z $$
+
+Teremos:
+
+$$ x = `r e13$mu` + `r e13$sigma` \cdot `r e13$z` $$
+
+```{r}
+e13$x <- e13$mu + e13$sigma * e13$z
+e13$x
+```
+
+### Questão D
+
+**Interpretação:** A maior distância de frenagem que carro um aleatório poderia ter e ainda estar no grupo dos 1% mais baixos é de aproximadamente `r r2(e13$x)` pés.
+
+
+## Exercício 14
+
+```{r}
+e14 <- list(
+  mu = 11.2,
+  sigma = 2.1,
+  p = 0.1,
+  x = NULL,
+  z = NULL
+)
+
+```
+
+### Questão A
+
+$$ \mu = `r e14$mu` $$
+$$ \sigma = `r e14$sigma` $$
+
+```{r}
+#| code-fold: true
+draft(
+  name = "Tempo de Trabalho",
+  mu = e14$mu,
+  sigma = e14$sigma,
+  x_min = e14$mu - e14$sigma * 3.5,
+  x_max = e14$mu + e14$sigma * 3.5,
+  x_step = ceiling(e14$sigma / 2),
+)
+```
+
+### Questão B
+
+A função `qnorm` novamente pode nos ajudar a encontrar o escore-z para
+$`r r2(e14$p)`$:
+
+```{r}
+e14$z <- qnorm(e14$p)
+e14$z
+```
+
+```{r}
+z_plot(e14$z)
+```
+
+### Questão C
+
+Novamente, pela fórmula:
+
+$$ x = \mu + \sigma \cdot z $$
+
+Teremos:
+
+$$ x = `r e14$mu` + `r e14$sigma` \cdot `r e14$z` $$
+
+```{r}
+e14$x <- e14$mu + e14$sigma * e14$z
+e14$x
+```
+
+### Questão D
+
+**Interpretação:** O tempo máximo que um funcionário pode ter trabalhado na empresa e ainda assim ser demitido é de aproximadamente 8 anos e 6 meses.
+
+## Exercício 15
+
+```{r}
+#| code-fold: true
+
+e15 <- list(
+  mu = 47,
+  sigma = 9,
+  n = 64,
+  s = NULL
+)
+
+```
+
+$$ \mu = `r e15$mu` = \overline{x} $$
+$$ \sigma = `r e15$sigma` $$
+$$ n = `r e15$n` $$
+
+Para o desvio padrão amostral, temos:
+
+```{r}
+e15$s <- e15$sigma / sqrt(e15$n)
+```
+
+$$ s = `r e15$s` $$
+
+$$ \because \; n \ge 30 \; \therefore \;
+\overline{X} \sim N(`r e15$mu`, `r e15$s`^2) $$
+
+```{r}
+#| code-fold: true
+
+draft(
+  name = "Contas de Telefone (Amostral)",
+  mu = e15$mu,
+  sigma = e15$s,
+  x_min = e15$mu - e15$s * 3.5,
+  x_max = e15$mu + e15$s * 3.5,
+  x_step = ceiling(e15$s / 2),
+)
+```
+
+## Exercício 16
+
+```{r}
+#| code-fold: true
+
+e16 <- list(
+  mu = 3.5,
+  sigma = 0.2,
+  n = 16,
+  s = NULL
+)
+
+```
+
+$$ \mu = `r e16$mu` = \overline{x} $$
+$$ \sigma = `r e16$sigma` $$
+$$ n = `r e16$n` $$
+
+Quanto ao erro padrão da distribuição amostral (desvio padrão amostral):
+
+```{r}
+e16$s <- e16$sigma / sqrt(e16$n)
+```
+
+$$ s = `r e16$s` $$
+
+A amostra não é grande o suficiente, mas a população é normalmente distribuída.
+Logo, podemos usar a distribuição normal:
+
+```{r}
+#| code-fold: true
+
+draft(
+  name = "Diâmetros (Amostral)",
+  mu = e16$mu,
+  sigma = e16$s,
+  x_min = e16$mu - e16$s * 3.5,
+  x_max = e16$mu + e16$s * 3.5,
+  x_step = 0.05,
+)
+```
+
+## Exercício 17
+
+```{r}
+#| code-fold: true
+
+e17 <- list(
+  mu = 25,
+  sigma = 1.5,
+  n = 100,
+  x1 = 24.7,
+  x2 = 25.5,
+  s = NULL
+)
+
+```
+
+_**Nota:** O valor da amostra repete-se no enunciado, como 50 e 100. Foi presumido o segundo valor, 100, por sua compatibilidade com a pergunta._
+
+### Questão A
+
+$$ \mu = `r e17$mu` = \overline{x} $$
+$$ \sigma = `r e17$sigma` $$
+$$ n = `r e17$n` $$
+
+Desvio padrão amostral:
+
+```{r}
+e17$s <- e17$sigma / sqrt(e17$n)
+```
+
+$$ s = `r e17$s` $$
+
+$$ \because \; n \ge 30 \; \therefore \;
+\overline{X} \sim N(`r e17$mu`, `r e17$s`^2) $$
+
+```{r}
+#| code-fold: true
+
+draft(
+  name = "Tempo Dirigindo (Amostral)",
+  mu = e17$mu,
+  sigma = e17$s,
+  x_min = e17$mu - e17$s * 3.5,
+  x_max = e17$mu + e17$s * 3.5,
+  x_step = e17$s,
+)
+```
+
+### Questão B e C
+
+Ainda precisamos determinar $P(`r e17$x1` \lt x \lt 25.5)$.
+
+Podemos obter $P$ através de:
+
+$$ P = P(`r e17$x2`) - P(`r e17$x1`) $$
+
+Podemos usar `pnorm` novamente para expressar o mesmo em R:
+
+```{r}
+#| output: asis
+(pnorm(e17$x2, mean = e17$mu, sd = e17$s) -
+pnorm(e17$x1, mean = e17$mu, sd = e17$s)) |>
+  ppercent()
+```
+
+### Questão D
+
+**Interpretação:** A probabilidade de que o tempo médio que $100$ motoristas aleatórios passem entre $24.7$ e $25.5$ minutos dirigindo é de aproximadamente $97.68\%$.
+
+## Exercício 18
+
+```{r}
+#| code-fold: true
+
+e18 <- list(
+  mu = 176800,
+  sigma = 50000,
+  n = 12,
+  x = 160000,
+  z = NULL,
+  s = NULL
+)
+
+```
+
+### Questão A
+
+$$ \mu = `r e18$mu` = \overline{x} $$
+$$ \sigma = `r e18$sigma` $$
+$$ n = `r e18$n` $$
+
+Desvio padrão amostral:
+
+```{r}
+e18$s <- e18$sigma / sqrt(e18$n)
+```
+
+$$ s = `r e18$s` $$
+
+```{r}
+#| code-fold: true
+
+draft(
+  name = "Residências (Amostral)",
+  mu = e18$mu,
+  sigma = e18$s,
+  x_min = e18$mu - e18$s * 3.5,
+  x_max = e18$mu + e18$s * 3.5,
+  x_step = e18$s * 2,
+)
+```
+
+### Questão B
+
+```{r}
+e18$z <- (e18$x - e18$mu) / e18$s
+```
+
+```{r}
+z_plot(e18$z, right = TRUE)
+```
+
+### Questão C
+
+```{r}
+#| output: asis
+pnorm(e18$z, lower.tail = FALSE) |> ppercent()
+```
+
+### Questão D
+
+**Interpretação:** Há uma probabilidade de aproximadamente
+$`r r2(pnorm(e18$z, lower.tail = FALSE) * 100)`\%$
+que o preço de vendas médio seja maior que US$ 160 000.
+
+## Exercício 19
+
+```{r}
+#| code-fold: true
+
+e19 <- list(
+  mu = 190,
+  sigma = 48,
+  n = 10,
+  x = 200,
+  z = NULL,
+  z_barra = NULL,
+  s = NULL
+)
+
+```
+
+$$ \mu = `r e19$mu` = \overline{x} $$
+$$ \sigma = `r e19$sigma` $$
+$$ n = `r e19$n` $$
+
+Desvio padrão amostral:
+
+```{r}
+e19$s <- e19$sigma / sqrt(e19$n)
+```
+
+$$ s = `r e19$s` $$
+
+```{r}
+#| code-fold: true
+
+draft(
+  name = "Monitores (Amostral)",
+  mu = e19$mu,
+  sigma = e19$s,
+  x_min = e19$mu - e19$s * 3.5,
+  x_max = e19$mu + e19$s * 3.5,
+  x_step = ceiling(e19$s / 2),
+)
+```
+
+```{r}
+e19$z <- (e19$x - e19$mu) / e19$sigma
+e19$z_barra <- (e19$x - e19$mu) / e19$s
+```
+
+### Questão B
+
+```{r}
+#| output: asis
+pnorm(e19$z) |> ppercent()
+```
+
+```{r}
+#| output: asis
+pnorm(e19$z_barra) |> ppercent()
+```
+
+```{r}
+z_plot(e19$z)
+z_plot(e19$z_barra)
+```
+
+### Questão C
+
+A amostra apresenta uma probabilidade maior. Isto é esperado, já que ela restringe a quantidade de casos extremos.
+
+## Exercício 20
+
+```{r}
+#| code-fold: true
+
+e20 <- list(
+  n = 100,
+  p = 0.34,
+  q = NULL,
+  np = NULL,
+  nq = NULL
+)
+
+```
+
+### Questão A
+
+```{r}
+e20$q <- 1 - e20$p
+```
+
+$$ n = `r e20$n` $$
+$$ p = `r e20$p` $$
+$$ q = `r e20$q` $$
+
+### Questão B
+
+```{r}
+e20$np <- e20$n * e20$p
+e20$nq <- e20$n * e20$q
+```
+$$ np = `r e20$np` $$
+$$ nq = `r e20$nq` $$
+
+### Questão C
+
+Podemos usar uma distribuição normal para aproximar, pois
+$np \ge 5 \land nq \ge 5$.
+
+### Questão D
+
+```{r}
+mu_b <- e20$np
+sigma_b <- sqrt(e20$n * e20$p * e20$q)
+```
+
+$$ \mu = `r mu_b` $$
+$$ \sigma = `r r4(sigma_b)` $$
+
+## Exercício 21
+
+```{r}
+#| code-fold: true
+
+e21 <- list(
+  n = 100,
+  p = 0.34,
+  q = NULL,
+  np = NULL,
+  nq = NULL,
+  mu = NULL,
+  sigma = NULL,
+  z = NULL,
+  ps = NULL,
+  a = NULL
+)
+
+```
+
+```{r}
+e21$q <- 1 - e21$p
+e21$np <- e21$n * e21$p
+e21$nq <- e21$n * e21$q
+```
+
+$$ n = `r e21$n` $$
+$$ p = `r e21$p` $$
+$$ q = `r e21$q` $$
+$$ np = `r e21$np` $$
+$$ nq = `r e21$nq` $$
+
+### Questão A
+
+Novamente podemos usar uma distribuição normal, dado que
+$np \ge 5 \land nq \ge 5$.
+
+### Questão B
+
+```{r}
+e21$mu <- e21$np
+e21$sigma <- sqrt(e21$n * e21$p * e21$q)
+```
+
+$$ \mu = `r e21$mu` $$
+$$ \sigma = `r r4(e21$sigma)` $$
+
+### Questão C
+
+Para corrigir $P(x > 30)$, usaremos $x \ge 30.5$.
+
+```{r}
+e21$a <- 30.5
+```
+
+### Questão D
+
+```{r}
+e21$z <- (e21$a - e21$mu) / e21$sigma
+e21$ps <- pnorm(e21$z, lower.tail = FALSE)
+```
+$$ z = `r e21$z` $$
+$$ P(X > 30) \approx P(Z > z) = `r r4(e21$ps)` $$
+
+```{r}
+z_plot(e21$z)
+```
+
+```{r}
+#| code-fold: true
+
+x_vector <- seq(e21$mu - 4*e21$sigma, e21$mu + 4*e21$sigma, length.out = 400)
+pairs <- tibble(x = x_vector, y = dnorm(
+  x_vector,
+  mean = e21$mu,
+  sd = e21$sigma
+)
+)
+
+ggplot(pairs, aes(x, y)) +
+  geom_line(color = "darkgreen") +
+  geom_area(data = subset(pairs, x >= e21$a),
+    aes(x, y),
+    fill = "darkgreen", alpha = 0.4) +
+  geom_vline(xintercept = e21$a, linetype = "dashed") +
+   labs(
+    title = paste(
+      "Aproximação Normal para Binomial, n =", e21$n, "p =", e21$p
+    ),
+    subtitle = "Em destaque, P(X > 30) com correção de continuidade",
+    x = "X",
+    y = "Densidade de probabilidade"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),
+    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),
+    axis.title.y = element_text(
+      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = "pt")
+    ),
+    axis.title.x = element_text(
+      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = "pt")
+    )
+  )
+```
+
+## Exercício 22
+
+```{r}
+#| code-fold: true
+
+e22 <- list(
+  n = 100,
+  p = 0.58,
+  q = NULL,
+  k = 100,
+  np = NULL,
+  nq = NULL,
+  mu = NULL,
+  sigma = NULL,
+  z = NULL,
+  ps = NULL,
+  a = NULL
+)
+
+```
+
+```{r}
+e22$q <- 1 - e22$p
+e22$np <- e22$n * e22$p
+e22$nq <- e22$n * e22$q
+```
+
+$$ n = `r e22$n` $$
+$$ p = `r e22$p` $$
+$$ q = `r e22$q` $$
+$$ np = `r e22$np` $$
+$$ nq = `r e22$nq` $$
+
+### Questão A
+
+Mais uma vez podemos usar uma distribuição normal, dado que
+$np \ge 5 \land nq \ge 5$.
+
+### Questão B
+
+```{r}
+e22$mu <- e22$np
+e22$sigma <- sqrt(e22$n * e22$p * e22$q)
+```
+
+$$ \mu = `r e22$mu` $$
+$$ \sigma = `r r4(e22$sigma)` $$
+
+## Exercício 23
+
+```{r}
+#| code-fold: true
+
+e23 <- list(
+  n = 75,
+  p = 0.32,
+  q = NULL,
+  x = 15,
+  np = NULL,
+  nq = NULL,
+  mu = NULL,
+  sigma = NULL,
+  xs = NULL,
+  xs = NULL,
+  zs = NULL,
+  zi = NULL,
+  prob = NULL
+)
+
+```
+
+```{r}
+e23$q <- 1 - e23$p
+e23$np <- e23$n * e23$p
+e23$nq <- e23$n * e23$q
+```
+
+$$ n = `r e23$n` $$
+$$ p = `r e23$p` $$
+$$ q = `r e23$q` $$
+$$ np = `r e23$np` $$
+$$ nq = `r e23$nq` $$
+
+### Questão A
+
+Ainda podemos usar uma distribuição normal, dado que
+$np \ge 5 \land nq \ge 5$.
+
+### Questão B
+
+```{r}
+e23$mu <- e23$np
+e23$sigma <- sqrt(e23$n * e23$p * e23$q)
+```
+
+$$ \mu = `r e23$mu` $$
+$$ \sigma = `r r4(e23$sigma)` $$
+
+### Questão C
+
+```{r}
+e23$xi <- e23$x - 0.5
+e23$xs <- e23$x + 0.5
+
+e23$zi <- (e23$xi - e23$mu) / e23$sigma
+e23$zs <- (e23$xs - e23$mu) / e23$sigma
+```
+
+$$ x_i = `r e23$xi` $$
+$$ x_s = `r e23$xs` $$
+$$ z_i = `r e23$zi` $$
+$$ z_s = `r e23$zs` $$
+
+
+### Questão D
+
+Para aproximar $P(X = 15)$ para a distribuição normal:
+
+```{r}
+#| output: asis
+pnorm(e23$zs) - pnorm(e23$zi) |> ppercent()
+```
+
+```{r}
+z_plot(e23$zs, opposite = e23$zi)
+```
+
+## Exercício 24
+
+O problema apresentado neste exercíciio é mais simples por poder ser reduzido a um vetor tal que:
+
+```{r}
+hours <- c(
+  26, 25, 32, 31, 28, 28,
+  28, 22, 28, 25, 21, 40,
+  32, 22, 25, 22, 26, 24,
+  46, 20, 35, 22, 32, 48,
+  32, 36, 38, 32, 22, 19
+)
+```
+
+### Questões A e B
+
+Com isso, podemos obter a média amostral, que corresponde também à média populacional:
+
+```{r}
+x_bar <- mean(hours)
+x_bar
+```
+
+## Exercício 25
+
+### Questão A
+
+Usando o mesmo vetor, teremos:
+
+```{r}
+n     <- length(hours)      # tamanho da amostra
+sigma <- 7.9                # desvio populacional
+alpha <- 0.05               # 95% de confiança
+z_c   <- qnorm(1 - alpha/2) # z-crítico
+```
+### Questão B
+
+Podemos obter a margem de erro por $z_c \cdot \sigma / \sqrt{n}$:
+
+```{r}
+E = z_c * sigma / sqrt(n)
+```
+
+### Questão C
+
+$$ n = `r n` $$
+$$ \sigma = `r sigma` $$
+$$ \alpha = `r alpha` $$
+$$ z_c = `r z_c` $$
+$$ E = `r E` $$
+
+**Interpretação:** Com 95% de confiança, a média de horas semanais está no intervalo $(26.31; 31.95)$.
+
+## Exercício 26
+
+```{r}
+n <- length(hours)
+s <- sd(hours)
+alpha <- 0.05
+f <- n - 1 # degrees of freedom
+t_c <- qt(1 - alpha/2, f)
+```
+
+### Questão A
+
+```{r}
+x_bar <- mean(hours)
+E <- t_c * s / sqrt(n)
+```
+
+$$ \overline{x} = `r x_bar` $$
+$$ E = `r E` $$
+
+### Questão B
+
+```{r}
+li <- x_bar - E
+ls <- x_bar + E
+```
+
+$$ l_i = `r li` $$
+$$ l_s = `r ls` $$
+
+### Questão C
+
+**Interpretação:** Com 95% de confiança, a média populacional de horas semanais está no intervalo $(`r r2(li)`; `r r2(ls)`)$.
+
+## Exercício 27
+
+Novamente, podemos usar apenas um vetor para os dados:
+
+```{r}
+hours <- c(
+  30, 26, 33, 26, 26, 33, 31, 31, 21, 37,
+  27, 20, 34, 35, 30, 24, 38, 34, 39, 31,
+  22, 30, 23, 23, 31, 44, 31, 33, 33, 26,
+  27, 28, 25, 35, 23, 32, 29, 31, 25, 27
+)
+
+sigma <- 7.9
+E <- 2
+alpha <- 0.05
+z_c <- qnorm(1 - alpha / 2)
+```
+
+$$ \sigma = `r sigma` $$
+$$ E = `r E` $$
+$$ \alpha = `r alpha` $$
+$$ z_c = `r z_c` $$
+
+Dadas estas informações, podemos obter:
+
+$$
+  n = (z_c \cdot sigma / E)^2
+$$
+
+```{r}
+n <- ceiling((z_c * sigma / E)^2)
+n
+```
+
+**Interpretação:** Pelo menos `r n` funcionários devem ser incluídos na amostra para ter 95% de confiança de que a diferença máxima entre a média amostral e a média populacional seja de 2 horas.
+
+## Exercício 28
+
+### Questão A
+
+Dada uma amostra de $n = 22$, podemos obter o grau de liberdade $f = n - 1$:
+
+
+```{r}
+n <- 22
+f <- n - 1
+```
+
+### Questão B
+
+```{r}
+c <- 0.90
+```
+
+### Questão C
+
+Novamente, usamos a função `qt` para obter o valor $t_c$.
+
+```{r}
+alpha <- 1 - c
+t_c <- qt(1 - alpha / 2, f)
+```
+
+### Questão D
+
+O valor crítico $t_c$ para um nível de confiança de 90% com uma amostra de 22 é
+`r t_c`.
+
+## Exercício 29
+
+Podemos definir as seguintes variáveis a partir do enunciado:
+
+```{r}
+n <- 16
+mu <- 162
+s <- 10
+f <- n - 1
+se <- s / sqrt(n)
+```
+
+Com elas, podemos então construir duas listas, cada uma contendo os limites superiores e inferiores para os intervalos de confiança de 90% e 99%:
+
+```{r}
+## 90%
+alpha90 <- 0.10
+t90 <- qt(1 - alpha90 / 2, f)
+e90 <- t90 * se
+ci90 <- list(i = x_bar - e90, s = x_bar + e90)
+
+## 99%
+alpha99 <- 0.01
+t99 <- qt(1 - alpha99 / 2, f)
+e99 <- t99 * se
+ci99 <- list(i = x_bar - e99, s = x_bar + e99)
+```
+
+Os valores obtidos mostram:
+
+- **Intervalo de confiança de 90%**
+  - Limite inferior `r r4(ci90$i)`
+  - Limite superior `r r4(ci90$s)`
+- **Intervalo de confiança de 99%**
+  - Limite inferior `r r4(ci99$i)`
+  - Limite superior `r r4(ci99$s)`
+
+## Exercício 30
+
+Novamente, podemos definir as seguintes variáveis a partir do enunciado:
+
+```{r}
+n     <- 36
+mu <- 9.75
+s     <- 2.39
+f    <- n - 1
+se    <- s / sqrt(n)
+```
+
+```{r}
+## 90%
+t90  <- qt(0.95, f)
+e90  <- t90 * se
+ci90 <- list(i = mu - e90, s = x_bar + e90)
+
+## 95%
+t95  <- qt(0.975, f)
+e95  <- t95 * se
+ci95 <- list(i = mu - e95, s = x_bar + e95)
+```
+
+Temos, portanto, os intervalos de confiança:
+
+```{r}
+ci90
+ci95
+```
+
+### Questão A
+
+- **Intervalo de confiança de 90%**
+  - $t_c = `r r4(t90)`$
+  - $E = `r r4(e90)`$
+- **Intervalo de confiança de 95%**
+  - $t_c = `r r4(t95)`$
+  - $E = `r r4(e95)`$
+
+### Questão B
+
+- **Intervalo de confiança de 90%**
+  - Limite inferior `r r4(ci90$i)`
+  - Limite superior `r r4(ci90$s)`
+- **Intervalo de confiança de 95%**
+  - Limite inferior `r r4(ci95$i)`
+  - Limite superior `r r4(ci95$s)`
+
+### Questão C
+
+Podemos comparar as larguras usando uma subtração simples:
+
+- **Intervalo de confiança de 90%**
+  - Largura: `r r4(ci90$s - ci90$i)`
+- **Intervalo de confiança de 95%**
+  - Largura: `r r4(ci95$s - ci95$i)`
+
+## Exercício 31
+
+Como o desvio padrão da população é desconhecido e temos uma amostra pequena, devemos usar a distribuição $t$ com um índice de liberdade de $n - 1$.
+
+Mais uma vez, vamos primeiro designar algumas variáveis com os valores do enunciado:
+
+```{r}
+n <- 18
+x_bar <- 64
+s <- 2.5
+f <- n - 1
+```
+
+Dado o intervalo de confiança de $90\%$, temos $\alpha = 0.1$:
+
+```{r}
+alpha <- 0.10
+t_c <- qt(1 - alpha / 2, f)
+se <- s / sqrt(n)
+```
+
+E com isso podemos obter a margem de erro:
+
+```{r}
+me <- t_c * se
+```
+
+Nosso intervalo de confiança estará, portanto, entre:
+
+```{r}
+c_i <- x_bar - me
+c_s <- x_bar + me
+```
+
+Ou seja, entre `r r4(c_i)` e `r r4(c_s)`.
+
+## Exercício 32
+
+### Questão A
+
+Pelo enunciado, temos:
+
+```{r}
+x <- 123
+n <- 2462
+```
+
+### Questão B
+
+Podemos obter $\hat{p}$ com uma proporção simples de $x \over n$.
+
+```{r}
+p_h <- x / n
+```
+
+$$ \hat{p} = `r p_h`$$
+
+
+## Exercício 33
+
+33. Use os dados do exercício 32 para construir um intervalo de confiança de 90% para a proporção populacional de professores americanos que disseram que “todas ou quase todas” as informações que eles encontram utilizando ferramentas de busca on-line são corretas ou confiáveis.
+
+### Questão A
+
+```{r}
+x     <- 123
+n     <- 2462
+p_h <- x / n
+q_h <- 1 - p_h
+```
+
+$$ \hat{p} = `r p_h` $$
+$$ \hat{q} = `r q_h` $$
+
+### Questão B
+
+```{r}
+np  <- n * p_h
+nq  <- n * q_h
+```
+
+A distribuição amostral pode ser aproximada por uma distribuição normal pois
+$ np = `r np` \gt 5 \land nq = `r nq` \gt 5 $.
+
+### Questão C
+
+```{r}
+z_c <- qnorm(0.95)
+e <- z_c * sqrt(p_h * q_h / n)
+```
+
+$$ z_c = `r z_c` $$
+$$ E = `r e` $$
+
+
+### Questão D
+
+```{r}
+l_i <- p_h - e
+l_s <- p_h + e
+```
+
+### Questão E
+
+O intervalo de confiança populacional é aproximadamente (0.0435; 0.0565).
+
+Com 90% de confiança, entre 4.35% e 5.65% dos professores dos Estados Unidos responderiam "todas ou quase todas".
+
+## Exercício 34
+
+### Questão A
+
+```{r}
+n <- 498
+p_h <- 0.25
+q_h <- 1 - p_h
+p_h
+q_h
+```
+
+$$ \hat{p} = `r p_h` $$
+$$ \hat{q} = `r q_h` $$
+
+### Questão B
+
+```{r}
+np  <- n * p_h
+nq  <- n * q_h
+```
+
+A amostra pode ser aproximada pela distribuição normal dado que
+$ np = `r np` \gt 5 \land nq = `r nq` \gt 5 $.
+
+### Questão C
+
+```{r}
+z_c <- qnorm(0.995)
+e <- z_c * sqrt(p_h * q_h / n)
+```
+
+$$ z_c = `r z_c` $$
+$$ E = `r e` $$
+
+### Questão D
+
+```{r}
+l_i <- p_h - e
+l_s <- p_h + e
+```
+$$ l_i = `r l_i` $$
+$$ l_s = `r l_s` $$
+
+### Questão E
+
+Com 99% de confiança, a proporção de adultos americanos que consideram pessoas acima de 65 anos os motoristas mais perigosos está entre aproximadamente 20% e 30%.
+
+## Exercício 35
+
+### Questão A
+
+```{r}
+p_h1 <- 0.5
+q_h1 <- 1 - p_h1
+
+p_h2 <- 0.31
+q_h2 <- 1 - p_h2
+
+z_c <- qnorm(0.95)
+e <- 0.02
+```
+
+### Questão B
+
+A partir de,
+
+$$ n = ({z_c}^2 \cdot \hat{p} \cdot \hat{q}) \over E^2 $$
+
+Temos:
+
+```{r}
+n1 <- (z_c^2 * p_h1 * q_h1) / e^2
+
+n2 <- (z_c^2 * p_h2 * q_h2) / e^2
+```
+
+$$ n_1 = `r n1` $$
+$$ n_2 = `r n2` $$
+
+### Questão C
+
+Dado o domínio da aplicação, precisamos dos valores arredondados:
+
+```{r}
+n1 <- ceiling(n1)
+n2 <- ceiling(n2)
+```
+
+Sem estimativa prévia, precisa-se de `r n1` pessoas Com $\hat{p} = 0.31$, precisa-se de `r n2` pessoas
+
+## Exercício 36
+
+36. Encontre os valores críticos χ2R e χ2L para um intervalo de confiança de 90% quando o tamanho da amostra é 30.
+
+### Questão A
+
+```{r}
+n <- 30
+f <- n - 1
+conf <- 0.90
+alpha <- 1 - conf
+f
+alpha
+```
+
+### Questão B
+
+As áreas são $0.05$ à direita e $0.05$ à esquerda.
+
+### Questão C
+
+Podemos usar a distribuição chi quadrado. Na linguagem R, a função `qchisq` oferece o que precisamos:
+
+```{r}
+c_r <- qchisq(1 - alpha / 2, f)
+c_l <- qchisq(alpha / 2,     f)
+```
+
+$$ c_r = `r c_r` $$
+$$ c_l = `r c_l` $$
+
+
+### Questão D
+
+Com 90% de confiança, χ^2 está entre aproximadamente 17.71 e aproximadamente 42.56.
+
+## Exercício 37
+
+### Questão A
+
+```{r}
+n <- 30
+f <- n - 1
+s <- 1.20
+
+conf1 <- 0.90; alpha1 <- 1 - conf1
+conf2 <- 0.95; alpha2 <- 1 - conf2
+
+c_r1 <- qchisq(1 - alpha1 / 2, f)
+c_l1 <- qchisq(alpha1 / 2, f)
+
+c_r2 <- qchisq(1 - alpha2 / 2, f)
+c_l2 <- qchisq(alpha2 / 2, f)
+```
+
+### Questão B
+
+```{r}
+var_est <- (f * s^2)
+
+# 90%
+v1_i <- var_est / c_r1
+v1_s <- var_est / c_l1
+
+# 95%
+v2_i <- var_est / c_r2
+v2_s <- var_est / c_l2
+```
+
+### Questão C
+
+```{r}
+sd1_i <- sqrt(v1_i)
+sd1_s <- sqrt(v1_s)
+
+sd2_i <- sqrt(v2_i)
+sd2_s <- sqrt(v2_s)
+```
+
+### Questão D
+
+- **Intervalo de confiança de 90%**
+  - Para a variância: `r r2(v1_i)` a `r r2(v1_s)`
+  - Para o desvio padrão: `r r2(sd1_i)` a `r r2(sd1_s)`
+- **Intervalo de confiança de 95%**
+  - Para a variância: `r r2(v2_i)` a `r r2(v2_s)`
+  - Para o desvio padrão: `r r2(sd2_i)` a `r r2(sd2_s)`
+
+## Exercício 38
+
+### Questão A
+
+1. $\mu \ne 74$
+2. $\sigma^2 \le 2.7$
+3. $p \gt 0.24$
+
+### Questão B
+
+1. $\mu = 74$
+2. $\sigma^2 \gt 2.7$
+3. $p \ge 0.24$
+
+
+### Questão C
+
+1. $H_0$ e $H_a$ para média
+  - $H_0: \mu = 74$
+  - $H_a: \mu \ne 74$ (afirmação)
+2. $H_0$ e $H_a$ para variância
+  - $H_0: \sigma^2 \le 2.7$ (afirmação)
+  - $H_a: \sigma^2 \gt 2.7$
+3. $H_0$ e $H_a$ para proporção
+  - $H_0: p \le 0.24$
+  - $H_a: p \gt 0.24$ (afirmação)
+
+## Exercício 39
+
+### Questão A
+
+- $H_0: p \le 0.01$
+- $H_a: p \gt  0.01$
+
+### Questão B
+
+- Erro tipo I: rejeitar $H_0$ quando $p \le 0.01$, concluindo que a taxa é $\gt 1\%$ quando na realidade é $\le 1\%$
+- Erro tipo II: não rejeitar $H_0$ quando $p \gt 0.01$, concluindo que a taxa é  $\le 1\%$ quando na realidade é $\gt 1\%$
+
+### Questão C
+
+O erro tipo II é mais sério.
+
+## Exercício 40
+
+### Questão A
+
+1. Analista de consumo
+  - $H_{0}\colon \mu = 74$
+  - $H_{a}\colon \mu \neq 74$
+2. Corretor de imóveis
+  - $H_{0}\colon p = 0.24$
+  - $H_{a}\colon p > 0.24$
+
+### Questão B
+
+1. Teste bilateral: $\mu \ne 74$
+
+```{r}
+z0 <- 2.1
+p_b <- 2 * (1 - pnorm(abs(z0)))
+p_b
+```
+
+2. Teste unilateral à direita: $p \gt 0.24$
+
+```{r}
+z0 <- 1.5
+p_u <- 1 - pnorm(z0)
+p_u
+```
+
+### Questão C
+
+```{r}
+z_plot(qnorm(1 - p_u), right = TRUE)
+```
+
+```{r}
+#| code-fold: true
+
+z_crit <- qnorm(1 - p_b / 2)
+pairs <- tibble(x = seq(-4, 4, length.out = 1000))
+pairs$y <- dnorm(pairs$x)
+
+ggplot(pairs, aes(x, y)) +
+  geom_line() +
+  geom_area(
+    data = subset(pairs, x <= -z_crit), aes(x, y),
+    fill = "darkgreen",
+    alpha = 0.5
+  ) +
+  geom_area(
+    data = subset(pairs, x >=  z_crit), aes(x, y),
+    fill = "darkgreen",
+    alpha = 0.5
+  ) +
+  geom_vline(xintercept = c(-z_crit, z_crit), linetype = "dashed") +
+  labs(
+    title = "Teste Bilateral",
+    x = "z",
+    y = "Densidade de probabilidade"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),
+    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),
+    axis.title.y = element_text(
+      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = "pt")
+    ),
+    axis.title.x = element_text(
+      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = "pt")
+    )
+  )
+```
+
+## Exercício 41
+
+### Interpretação: rejeitar $H_0$
+
+- **Proporção de estudantes: 61%**
+  - Há evidência suficiente para afirmar que a proporção de estudantes em atividades extracurriculares não é 0.61
+  - $\text{Rejeitar } H_0 \colon p = 0.61 \Longrightarrow p \neq 0.61$
+- **Tempo médio de troca de óleo é menor que 15 min**
+  - Há evidência suficiente para concluir que o tempo médio é menor que 15 minutos
+  - $\text{Rejeitar } H_0 \colon \mu = 15 \Longrightarrow \mu \lt 15$
+
+### Interpretação: não rejeitar $H_0$
+
+- Proporção de estudantes é 61%
+  - Não há evidência suficiente para afirmar que a proporção difere de 0.61
+- Tempo médio de troca de óleo é menor que 15 min
+  - Não há evidência suficiente para afirmar que o tempo médio é menor que 15 minutos
+
+
+## Exercício 42
+
+42. Você realiza um teste de hipótese para cada uma das afirmações. Como você deveria interpretar sua decisão se rejeitar H0? E se você não rejeitar H0? Ha (afirmação): Um corretor de imóveis divulga que a proporção de proprietários que acham suas casas muito pequenas para suas famílias é mais que 24%.
+
+### Questão A
+
+Se rejeitarmos $H_0$, a interpretação seria de que há evidência suficiente para concluir que a proporção de proprietários que acham suas casas muito pequenas é maior que 24%.
+
+### Questão B
+
+Se não rejeitarmos $H_0$, a interpretação seria de que não há evidência suficiente para concluir que a proporção de proprietários que acham suas casas muito pequenas é maior que 24%.
+
+## Exercício 43
+
+43. Encontre o valor p para um teste de hipótese unilateral à esquerda com uma estatística de teste padronizada z = –1,71. Decida se rejeita H0 quando o nível de significância é α = 0,05.
+
+### Questão A
+
+```{r}
+z <- -1.71
+p <- pnorm(z)
+p
+```
+
+### Questão B
+
+Este valor é o mesmo obtido na questão A, $`r p`$.
+
+### Questão C
+
+**Interpretação:** Uma vez que $p = `r p` < \alpha = `r alpha`$ , devemos rejeitar $H_0$.
+
+## Exercício 44
+
+### Questão A
+
+```{r}
+z <- 1.64
+p <- pnorm(z)
+p
+```
+
+### Questão B
+
+```{r}
+p_2 <- 2 * (1 - pnorm(z))
+p_2
+```
+
+### Questão C
+
+$$
+  p = `r p` > \alpha = 0.10 \Longrightarrow \text{Não rejeitar } H_{0}.
+$$
+
+## Exercício 45
+
+### Questão A
+
+- $H_{0}\colon \mu = 35$
+- $H_{a}\colon \mu > 35$
+
+### Questão B
+
+- $\alpha = 0.05$
+
+### Questão C
+
+```{r}
+x_bar <- 36
+mu <- 35
+sigma <- 4
+n <- 100
+
+z <- (x_bar - mu) / (sigma / sqrt(n))
+z
+```
+
+### Questão D
+
+```{r}
+p <- 1 - pnorm(z)
+p
+```
+
+### Questão E
+
+Dado que $p = `r p` < \alpha = 0.05$, devemos rejeitar $H_0$.
+
+### Questão F
+
+**Interpretação:** Há evidência suficiente para concluir que a velocidade média dos veículos ultrapassa 35 milhas por hora.
+
+## Exercício 46
+
+### Questão A
+
+- Afirmação: "o tempo médio para recuperar o custo é 3 anos".
+- $H_0: \mu = 3$
+- $H_1: \mu \neq 3$
+
+### Questão B
+
+```{r}
+alpha <- 0.01
+```
+
+### Questão C
+
+```{r}
+x_bar <- 3.3
+mu  <- 3
+sigma <- 0.5
+n <- 25
+
+z <- (x_bar - mu) / (sigma / sqrt(n))
+z
+```
+
+### Questão D
+
+```{r}
+p <- 2 * (1 - pnorm(abs(z)))
+p
+```
+
+### Questão E
+
+Como $p \approx 0.0027 < \alpha = 0.01$, devemos rejeitar $H_0$.
+
+### Questão F
+
+**Interpretação:** Há evidências suficientes de que o tempo médio para recuperar o custo difere de 3 anos. No caso da presente estatística, ele parece ser maior.
+
+## Exercício 47
+
+### Questão A
+
+```{r}
+alpha <- 0.10
+```
+
+```{r}
+z_plot(qnorm(alpha))
+```
+
+### Questão B
+
+```{r}
+z <- -1.28
+a <- pnorm(z)
+a
+```
+
+### Questão C
+
+```{r}
+z_a <- qnorm(a)
+z_a
+```
+
+```{r}
+z_plot(z_a)
+```
+
+### Questão D
+
+A zona de rejeição está à esquerda de $z = `r z_a`$, ou seja, devemos rejeitar se $z \lt `r z_a`$.
+
+## Exercício 48
+
+### Questão A
+
+```{r}
+#| code-fold: true
+
+alpha <- 0.08
+z_i <- qnorm(alpha / 2)
+z_s <- qnorm(1 - alpha / 2)
+
+df <- tibble(x = seq(-4, 4, length.out = 400))
+df$y <- dnorm(df$x)
+
+ggplot(df, aes(x = x, y = y)) +
+  geom_line(linewidth = 1) +
+  geom_ribbon(data = subset(df, x <= z_i),
+              aes(ymin = 0, ymax = y),
+              fill = "darkgreen", alpha = 0.5) +
+  geom_ribbon(data = subset(df, x >= z_s),
+              aes(ymin = 0, ymax = y),
+              fill = "darkgreen", alpha = 0.5) +
+  geom_vline(xintercept = c(z_i, z_s),
+             linetype = "dashed", color = "darkgreen") +
+  annotate("text", x = z_i, y = max(df$y) * 0.6,
+           label = paste0("z_i = ", round(z_i, 3)),
+           hjust = 1.1, color = "darkgreen") +
+  annotate("text", x = z_s, y = max(df$y) * 0.6,
+           label = paste0("z_s = ", round(z_s, 3)),
+           hjust = -0.1, color = "darkgreen") +
+  labs(
+    title = "Curva Normal Padrão: α/2 em cada cauda",
+    x = "z",
+    y = "f(z)"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),
+    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),
+    axis.title.y = element_text(
+      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = "pt")
+    ),
+    axis.title.x = element_text(
+      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = "pt")
+    )
+  )
+```
+
+### Questão B
+
+```{r}
+alpha <- 0.08
+a_i <- pnorm(qnorm(alpha/2))
+a_s <- pnorm(qnorm(1 - alpha/2))
+```
+
+$$ a_i = `r a_i` $$
+$$ a_s = `r a_s` $$
+
+### Questão C
+
+```{r}
+z_i <- qnorm(0.04)
+z_s <- qnorm(0.96)
+z_i  # -1.750686
+z_s  #  1.750686
+```
+
+### Questão D
+
+Rejeitar $H_0$ se $z \lt `r z_i`$ ou $z \gt `r z_s`$.
+
+## Exercício 49
+
+- **Hipóteses**
+  - $H_0: \mu = 68000$
+  - $H_1: \mu \lt 68000$
+
+
+```{r}
+x_bar  <- 66900
+mu <- 68000
+sigma <- 5500
+n <- 20
+
+z <- (x_bar - mu) / (sigma / sqrt(n))
+p <- pnorm(z)
+```
+
+$$ z = `r z` $$
+$$ p = `r p` $$
+
+$`r p` \gt \alpha = 0.05$, logo, não devemos rejeitar $H_0$.
+
+**Interpretação:** Não há evidência suficiente de que o salário médio seja menor que $68 000$.
+
+## Exercício 50
+
+### Questão A
+
+```{r}
+alpha1 <- 0.1
+alpha2 <- 0.01
+```
+
+### Questão B
+
+```{r}
+z_1 <- qnorm(1 - alpha1 / 2)
+z_2 <- qnorm(1 - alpha2 / 2)
+```
+
+$$ z_1 = `r z_1` $$
+$$ z_2 = `r z_2` $$
+
+As regiões de rejeição são $z \lt -z_0$ ou $z > z_0$.
+
+### Questão C
+
+```{r}
+#| code-fold: true
+
+library(ggplot2)
+alpha <- 0.10
+z0 <- qnorm(1 - alpha / 2)
+x <- seq(-4, 4, length = 400)
+y <- dnorm(x)
+ggplot(data.frame(x, y), aes(x, y)) +
+  geom_line() +
+  geom_ribbon(data = subset(data.frame(x, y), x <= -z0),
+    aes(ymin = 0, ymax = y), fill = "darkgreen", alpha = 0.5) +
+  geom_ribbon(data = subset(data.frame(x, y), x >=  z0),
+    aes(ymin = 0, ymax = y), fill = "darkgreen", alpha = 0.5) +
+  geom_vline(
+    xintercept = c(-z0, z0),
+    linetype = "dashed",
+    color = "darkgreen"
+  ) +
+  geom_vline(xintercept = z, colour = "darkgreen") +
+  labs(title = "Teste Z bilateral",
+    subtitle = paste("α = 0.1, z = ", round(z, 3))) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),
+    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),
+    axis.title.y = element_text(
+      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = "pt")
+    ),
+    axis.title.x = element_text(
+      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = "pt")
+    )
+  )
+```
+
+### Questão D
+
+**Interpretação:** Com $\alpha = 0.1$, há evidência suficiente para rejeitar a afirmação de que o custo médio é $13960$ (o custo médio parece menor). Com $\alpha = 0.01$, não há evidência suficiente para rejeitar a afirmação.
+
+## Exercício 51
+
+### Questão A
+
+$$gl = n - 1 = 9 - 1 = 8$$
+
+### Questão B
+
+```{r}
+alpha <- 0.10
+f    <- 8
+
+t0 <- qt(1 - alpha, f)
+```
+
+$$ t_0 = `r t0` $$
+
+## Exercício 52
+
+52. Encontre os valores críticos –t0 e t0 para um teste bilateral para α = 0,05 e n = 16.
+
+### Questão A
+
+$$gl = n - 1 = 16 - 1 = 15$$
+
+### Questão B
+
+```{r}
+alpha <- 0.05
+f <- 15
+
+t_i <- qt(alpha / 2, f)
+t_s <- qt(1 - alpha / 2, f)
+```
+
+$$ t_i = `r t_i` $$
+$$ t_s = `r t_s` $$
+
+## Exercício 53
+
+### Questão A
+
+$$ H_0:\ \mu = 1200 $$
+$$ H_a:\ \mu < 1200 $$
+
+### Questão B
+
+```{r}
+alpha <- 0.1
+n <- 7
+f <- n - 1
+```
+
+### Questão C
+
+```{r}
+t <- qt(alpha, f)
+```
+
+$$ t = `r t` $$
+
+### Questão D
+
+```{r}
+x_bar <- 1125
+mu <- 1200
+s <- 55
+n <- 7
+
+t_stat <- (x_bar - mu) / (s / sqrt(n))
+p <- pt(t_stat, f)
+```
+
+$$ t_{stat} = `r t_stat` $$
+$$ p = `r p` $$
+
+```{r}
+#| code-fold: true
+
+pairs <- tibble(x = seq(-4, 4, length.out = 400))
+pairs$y <- dt(pairs$x, df = f)
+
+ggplot(pairs, aes(x, y)) +
+  geom_line() +
+  geom_ribbon(data = subset(pairs, x <= t0),
+    aes(ymin = 0, ymax = y),
+    fill = "darkgreen", alpha = 0.5) +
+  geom_vline(xintercept = c(t0, t_stat),
+    linetype = "dashed",
+    color = c("black", "darkgreen")) +
+  annotate("text", x = t0, y = max(pairs$y) * 0.9,
+    label = paste0("t0=", round(t0, 3)),
+    hjust = 1.1, color = "black") +
+  annotate("text", x = t_stat, y = max(pairs$y) * 0.7,
+    label = paste0("t=", round(t_stat, 3)),
+    hjust = -0.1, color = "darkgreen") +
+  labs(title = "Distribuição t (df=6)",
+    subtitle = "Área à esquerda de t0 = região de rejeição",
+    x = "t", y = "f(t)") +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),
+    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),
+    axis.title.y = element_text(
+      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = "pt")
+    ),
+    axis.title.x = element_text(
+      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = "pt")
+    )
+  )
+```
+
+### Questão E
+
+$$ p \approx 0.044 < \alpha = 0.1 \Longrightarrow \text{ Rejeita } H_0$$
+
+### Questão F
+
+**Interpretação:** Há evidência de que o custo médio do seguro é menor que 1200.
+
+## Exercício 54
+
+54. Uma indústria afirma que o nível médio do pH da água em um rio próximo é de 6,8. Você seleciona aleatoriamente 39 amostras de água e mede o pH de cada uma. A média amostral e o desvio padrão são de 6,7 e 0,35, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando nível de significância α = 0,05?
+
+Esta mesma indústria afirma que a condutividade média do rio é de 1.890 mg/l. A condutividade de uma amostra de água é uma medida do total de sólidos dissolvidos na amostra. Você seleciona aleatoriamente 39 amostras de água e mede a condutividade de cada uma. A média e o desvio padrão amostral são de 2.350 mg/l e 900 mg/l, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando o nível de significância α = 0,01?
+
+### Questão A
+
+#### pH
+
+- $$ H_0: \mu_{pH} &= 6.8 $$
+- $$ H_a: \mu_{pH} &\neq 6.8 $$
+
+#### Condutividade
+
+- $$ H_0: \mu_{cond} &= 1890 $$
+- $$ H_a: \mu_{cond} &\neq 1890 $$
+
+### Questão B
+
+- $$ \text{pH: }&\alpha = 0.05,\quad df = 39 - 1 = 38 $$
+- $$ \text{Cond: }&\alpha = 0.01,\quad df = 39 - 1 = 38 $$
+
+### Questão C
+
+```{r}
+df    <- 38
+t_crit05 <- qt(1 - 0.05 / 2, df)
+t_crit01 <- qt(1 - 0.01 / 2, df)
+t_crit05; -t_crit05
+# [1]  2.024394 -2.024394
+
+t_crit01; -t_crit01
+# [1]  2.715158 -2.715158
+```
+
+### Questão D
+
+```{r}
+# pH
+xbar1 <- 6.7
+mu01  <- 6.8
+s1    <- 0.35
+n1    <- 39
+df    <- n1 - 1
+
+t1    <- (xbar1 - mu01) / (s1 / sqrt(n1))
+p1    <- 2 * pt(-abs(t1), df)
+
+# condutividade
+xbar2 <- 2350
+mu02  <- 1890
+s2    <- 900
+n2    <- 39
+
+t2    <- (xbar2 - mu02) / (s2 / sqrt(n2))
+p2    <- 2 * pt(-abs(t2), df)
+
+t1; p1
+# t1 ≈ -1.786, p1 ≈ 0.081
+
+t2; p2
+# t2 ≈ 3.190,  p2 ≈ 0.0029
+```
+
+```{r}
+#| code-fold: true
+
+pairs <- data.frame(x = seq(-4, 4, length.out = 400))
+pairs$y <- dt(pairs$x, df = df)
+
+ggplot(pairs, aes(x, y)) +
+  geom_line() +
+  geom_vline(xintercept = c(-t_crit05, t_crit05, t1),
+             linetype = "dashed",
+             color = c("red", "red","darkgreen")) +
+  annotate("text", x = t1, y = max(pairs$y) * 0.7,
+           label = paste0("t1=", round(t1, 3)),
+           color = "blue") +
+  labs(title = "Teste t bilateral para pH",
+       subtitle = paste("t1 =", round(t1, 3),
+                        " | região de rejeição |t| > 2.0244"),
+       x = "t", y = "f(t)") +
+  theme_minimal()
+```
+
+### Questão E
+
+- pH ($\alpha = 0.05$)
+  - $p_1 \approx 0.081 > 0.05 \Longrightarrow$ Não rejeita $H_0$
+- Condutividade ($\alpha = 0.01$)
+  - $p_2 \approx 0.0029 > 0.01 \Longrightarrow$ Rejeita $H_0$
+
+### Questão F
+
+**Interpretação:**
+  - pH: Não há evidência suficiente para rejeitar a afirmação de nível médio 6.8.
+  - Condutividade: Há evidência suficiente para rejeitar a afirmação de média 1890 mg/L.
+
+

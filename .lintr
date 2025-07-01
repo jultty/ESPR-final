@@ -1,0 +1,9 @@
+linters: linters_with_defaults(
+    line_length_linter(80),
+    commented_code_linter = NULL,
+    trailing_whitespace_linter = NULL,
+    indentation_linter = NULL,
+    object_usage_linter = NULL,
+    brace_linter(allow_single_line = TRUE),
+    semicolon_linter(allow_compound = TRUE)
+    )
