@@ -1478,7 +1478,7 @@ z_plot(e23$zs, opposite = e23$zi)
 
 ## Exercício 24
 
-O problema apresentado neste exercíciio é mais simples por poder ser reduzido a um vetor tal que:
+O problema apresentado neste exercício é mais simples por poder ser reduzido a um vetor tal que:
 
 ```{r}
 hours <- c(
@@ -1589,7 +1589,7 @@ $$ z_c = `r z_c` $$
 Dadas estas informações, podemos obter:
 
 $$
-  n = (z_c \cdot sigma / E)^2
+  n = (z_c \cdot \sigma / E)^2
 $$
 
 ```{r}
@@ -1786,8 +1786,6 @@ $$ \hat{p} = `r p_h`$$
 
 ## Exercício 33
 
-33. Use os dados do exercício 32 para construir um intervalo de confiança de 90% para a proporção populacional de professores americanos que disseram que “todas ou quase todas” as informações que eles encontram utilizando ferramentas de busca on-line são corretas ou confiáveis.
-
 ### Questão A
 
 ```{r}
@@ -1808,7 +1806,7 @@ nq  <- n * q_h
 ```
 
 A distribuição amostral pode ser aproximada por uma distribuição normal pois
-$ np = `r np` \gt 5 \land nq = `r nq` \gt 5 $.
+$np = `r np` \gt 5 \land nq = `r nq` \gt 5$.
 
 ### Questão C
 
@@ -1856,8 +1854,8 @@ np  <- n * p_h
 nq  <- n * q_h
 ```
 
-A amostra pode ser aproximada pela distribuição normal dado que
-$ np = `r np` \gt 5 \land nq = `r nq` \gt 5 $.
+Tamém podemos aproximar pela distribuição normal dado que
+$np = `r np` \gt 5 \land nq = `r nq` \gt 5$.
 
 ### Questão C
 
@@ -1923,7 +1921,7 @@ n1 <- ceiling(n1)
 n2 <- ceiling(n2)
 ```
 
-Sem estimativa prévia, precisa-se de `r n1` pessoas Com $\hat{p} = 0.31$, precisa-se de `r n2` pessoas
+Sem estimativa prévia, precisa-se de `r n1` pessoas Com $\hat{p} = 0.31$, precisa-se de `r n2` pessoas.
 
 ## Exercício 36
 
@@ -2150,8 +2148,6 @@ ggplot(pairs, aes(x, y)) +
 
 ## Exercício 42
 
-42. Você realiza um teste de hipótese para cada uma das afirmações. Como você deveria interpretar sua decisão se rejeitar H0? E se você não rejeitar H0? Ha (afirmação): Um corretor de imóveis divulga que a proporção de proprietários que acham suas casas muito pequenas para suas famílias é mais que 24%.
-
 ### Questão A
 
 Se rejeitarmos $H_0$, a interpretação seria de que há evidência suficiente para concluir que a proporção de proprietários que acham suas casas muito pequenas é maior que 24%.
@@ -2161,8 +2157,6 @@ Se rejeitarmos $H_0$, a interpretação seria de que há evidência suficiente p
 Se não rejeitarmos $H_0$, a interpretação seria de que não há evidência suficiente para concluir que a proporção de proprietários que acham suas casas muito pequenas é maior que 24%.
 
 ## Exercício 43
-
-43. Encontre o valor p para um teste de hipótese unilateral à esquerda com uma estatística de teste padronizada z = –1,71. Decida se rejeita H0 quando o nível de significância é α = 0,05.
 
 ### Questão A
 
@@ -2494,8 +2488,6 @@ $$ t_0 = `r t0` $$
 
 ## Exercício 52
 
-52. Encontre os valores críticos –t0 e t0 para um teste bilateral para α = 0,05 e n = 16.
-
 ### Questão A
 
 $$gl = n - 1 = 16 - 1 = 15$$
@@ -2589,7 +2581,7 @@ ggplot(pairs, aes(x, y)) +
 
 ### Questão E
 
-$$ p \approx 0.044 < \alpha = 0.1 \Longrightarrow \text{ Rejeita } H_0$$
+$$ p \approx 0.044 < \alpha = 0.1 \Longrightarrow \text{ Rejeitar } H_0$$
 
 ### Questão F
 
@@ -2597,101 +2589,108 @@ $$ p \approx 0.044 < \alpha = 0.1 \Longrightarrow \text{ Rejeita } H_0$$
 
 ## Exercício 54
 
-54. Uma indústria afirma que o nível médio do pH da água em um rio próximo é de 6,8. Você seleciona aleatoriamente 39 amostras de água e mede o pH de cada uma. A média amostral e o desvio padrão são de 6,7 e 0,35, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando nível de significância α = 0,05?
-
-Esta mesma indústria afirma que a condutividade média do rio é de 1.890 mg/l. A condutividade de uma amostra de água é uma medida do total de sólidos dissolvidos na amostra. Você seleciona aleatoriamente 39 amostras de água e mede a condutividade de cada uma. A média e o desvio padrão amostral são de 2.350 mg/l e 900 mg/l, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando o nível de significância α = 0,01?
-
 ### Questão A
 
 #### pH
 
-- $$ H_0: \mu_{pH} &= 6.8 $$
-- $$ H_a: \mu_{pH} &\neq 6.8 $$
+- $H_0: \mu_{pH} = 6.8$
+- $H_a: \mu_{pH} \neq 6.8$
 
 #### Condutividade
 
-- $$ H_0: \mu_{cond} &= 1890 $$
-- $$ H_a: \mu_{cond} &\neq 1890 $$
+- $H_0: \mu_{cond} = 1890$
+- $H_a: \mu_{cond} \neq 1890$
 
 ### Questão B
 
-- $$ \text{pH: }&\alpha = 0.05,\quad df = 39 - 1 = 38 $$
-- $$ \text{Cond: }&\alpha = 0.01,\quad df = 39 - 1 = 38 $$
+- pH: $\alpha = 0.05,\quad df = 39 - 1 = 38$
+- Condutividade: $\alpha = 0.01,\quad df = 39 - 1 = 38$
 
 ### Questão C
 
 ```{r}
-df    <- 38
+df <- 38
 t_crit05 <- qt(1 - 0.05 / 2, df)
 t_crit01 <- qt(1 - 0.01 / 2, df)
-t_crit05; -t_crit05
-# [1]  2.024394 -2.024394
-
-t_crit01; -t_crit01
-# [1]  2.715158 -2.715158
 ```
+
+$$ t_crit05 = `r t_crit05` $$
+$$ t_crit01 = `r t_crit01` $$
 
 ### Questão D
 
 ```{r}
 # pH
 xbar1 <- 6.7
-mu01  <- 6.8
-s1    <- 0.35
-n1    <- 39
-df    <- n1 - 1
+mu01 <- 6.8
+s1 <- 0.35
+n1 <- 39
+df <- n1 - 1
 
-t1    <- (xbar1 - mu01) / (s1 / sqrt(n1))
-p1    <- 2 * pt(-abs(t1), df)
+t1 <- (xbar1 - mu01) / (s1 / sqrt(n1))
+p1 <- 2 * pt(-abs(t1), df)
 
 # condutividade
 xbar2 <- 2350
-mu02  <- 1890
-s2    <- 900
-n2    <- 39
+mu02 <- 1890
+s2 <- 900
+n2 <- 39
 
-t2    <- (xbar2 - mu02) / (s2 / sqrt(n2))
-p2    <- 2 * pt(-abs(t2), df)
-
-t1; p1
-# t1 ≈ -1.786, p1 ≈ 0.081
-
-t2; p2
-# t2 ≈ 3.190,  p2 ≈ 0.0029
+t2 <- (xbar2 - mu02) / (s2 / sqrt(n2))
+p2 <- 2 * pt(-abs(t2), df)
 ```
+
+$$ t_1 = `r t1` $$
+$$ p_1 = `r p1` $$
+
+$$ t_2 = `r t2` $$
+$$ p_2 = `r p2` $$
 
 ```{r}
 #| code-fold: true
 
-pairs <- data.frame(x = seq(-4, 4, length.out = 400))
+pairs <- tibble(x = seq(-4, 4, length.out = 400))
 pairs$y <- dt(pairs$x, df = df)
 
 ggplot(pairs, aes(x, y)) +
   geom_line() +
   geom_vline(xintercept = c(-t_crit05, t_crit05, t1),
-             linetype = "dashed",
-             color = c("red", "red","darkgreen")) +
+    linetype = "dashed",
+    color = c("red", "red", "darkgreen")
+  ) +
   annotate("text", x = t1, y = max(pairs$y) * 0.7,
-           label = paste0("t1=", round(t1, 3)),
-           color = "blue") +
+    label = paste0("t1=", round(t1, 3)),
+    color = "darkgreen"
+  ) +
   labs(title = "Teste t bilateral para pH",
-       subtitle = paste("t1 =", round(t1, 3),
-                        " | região de rejeição |t| > 2.0244"),
-       x = "t", y = "f(t)") +
-  theme_minimal()
+    subtitle = paste("t1 =", round(t1, 3),
+    " | região de rejeição |t| > 2.0244"),
+    x = "t"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),
+    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),
+    axis.title.y = element_text(
+      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = "pt")
+    ),
+    axis.title.x = element_text(
+      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = "pt")
+    )
+  )
 ```
 
 ### Questão E
 
 - pH ($\alpha = 0.05$)
-  - $p_1 \approx 0.081 > 0.05 \Longrightarrow$ Não rejeita $H_0$
+  - $p_1 \approx 0.081 > 0.05 \Longrightarrow$ Não rejeitar $H_0$
 - Condutividade ($\alpha = 0.01$)
-  - $p_2 \approx 0.0029 > 0.01 \Longrightarrow$ Rejeita $H_0$
+  - $p_2 \approx 0.0029 > 0.01 \Longrightarrow$ Rejeitar $H_0$
 
 ### Questão F
 
-**Interpretação:**
-  - pH: Não há evidência suficiente para rejeitar a afirmação de nível médio 6.8.
-  - Condutividade: Há evidência suficiente para rejeitar a afirmação de média 1890 mg/L.
+- **Interpretação:**
+  - pH: Não há evidência suficiente para rejeitar a afirmação de nível médio 6.8
+  - Condutividade: Há evidência suficiente para rejeitar a afirmação de média 1890 mg/L
 
 
