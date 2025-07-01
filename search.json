@@ -1,0 +1,800 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Trabalho Final",
+    "section": "",
+    "text": "Este trabalho foi elaborado para a disciplina de Estatística e Probabilidade, sob orientação do Prof. Dr. Cleverson Pinheiro, como parte curso de Análise e Desenvolvimento de Sistemas do Instituto Federal de São Paulo, Campus Jacareí. Ele foi desenvolvido utilizando a linguagem de programação R, a ferramenta de publicação Quarto e o conjunto de pacotes tidyverse.\nO código fonte correspondente a este documento está também disponível no GitHub, no repositório jultty/ESPR-final. Ele pode ser visualizado em sua versão como página web em jultty.github.io/ESPR-final.\n\nSoftwares utilizados e versões:\n\nR 4.2.2, de 10 de novembro de 2022\nQuarto 1.7.32, de 16 de junho de 2025\ntidyverse 2.0.0, de 22 de fevereiro de 2023, com atualizações de pacotes individuais\n\n\nOs pacotes utilizados podem ser visualizadas na relação abaixo, onde são de fato carregados no ambiente de desenvolvimento.\n\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(tidyr)\nlibrary(scales)\n\nBlocos de código como o exibido acima são utilizados ao longo deste documento. Em algumas ocasiões, eles estão ocultos por terem menor importância para a demonstração da solução – por exemplo, código relacionado estritamente à plotagem de gráficos e não à definição de um cálculo ou algoritmo que de fato informa o gráfico.\nNestes casos, o texto “⯈ Código” aparece onde o código está oculto e apenas seu resultado é exibido, seja ele um número, texto, conjunto de dados ou gráfico. Clicando sobre este texto, é possível expandir e visualizar o código na íntegra:\n\n\nCódigo\nexp(1i * pi) + 1\n\n\n[1] 0+1.224647e-16i\n\n\n\n\nPara manter a consistência com as saídas computacionais, neste trabalho utilizou-se exclusivamente o ponto como marcador de casas decimais."
+  },
+  {
+    "objectID": "index.html#introdução",
+    "href": "index.html#introdução",
+    "title": "Trabalho Final",
+    "section": "",
+    "text": "Este trabalho foi elaborado para a disciplina de Estatística e Probabilidade, sob orientação do Prof. Dr. Cleverson Pinheiro, como parte curso de Análise e Desenvolvimento de Sistemas do Instituto Federal de São Paulo, Campus Jacareí. Ele foi desenvolvido utilizando a linguagem de programação R, a ferramenta de publicação Quarto e o conjunto de pacotes tidyverse.\nO código fonte correspondente a este documento está também disponível no GitHub, no repositório jultty/ESPR-final. Ele pode ser visualizado em sua versão como página web em jultty.github.io/ESPR-final.\n\nSoftwares utilizados e versões:\n\nR 4.2.2, de 10 de novembro de 2022\nQuarto 1.7.32, de 16 de junho de 2025\ntidyverse 2.0.0, de 22 de fevereiro de 2023, com atualizações de pacotes individuais\n\n\nOs pacotes utilizados podem ser visualizadas na relação abaixo, onde são de fato carregados no ambiente de desenvolvimento.\n\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(tidyr)\nlibrary(scales)\n\nBlocos de código como o exibido acima são utilizados ao longo deste documento. Em algumas ocasiões, eles estão ocultos por terem menor importância para a demonstração da solução – por exemplo, código relacionado estritamente à plotagem de gráficos e não à definição de um cálculo ou algoritmo que de fato informa o gráfico.\nNestes casos, o texto “⯈ Código” aparece onde o código está oculto e apenas seu resultado é exibido, seja ele um número, texto, conjunto de dados ou gráfico. Clicando sobre este texto, é possível expandir e visualizar o código na íntegra:\n\n\nCódigo\nexp(1i * pi) + 1\n\n\n[1] 0+1.224647e-16i\n\n\n\n\nPara manter a consistência com as saídas computacionais, neste trabalho utilizou-se exclusivamente o ponto como marcador de casas decimais."
+  },
+  {
+    "objectID": "index.html#funções-utilitárias",
+    "href": "index.html#funções-utilitárias",
+    "title": "Trabalho Final",
+    "section": "Funções Utilitárias",
+    "text": "Funções Utilitárias\nPrimeiro, podemos definir algumas funções auxiliares que serão úteis ao longo de todo o trabalho.\n\n## Usando notação Latex, mostra um número com seis casas decimais e\n## a porcentagem equivalente com duas casas decimais\nppercent &lt;- function(raw) {\n  sprintf(\"$$P = %.6f \\\\approx %.2f\\\\%%$$\", raw, raw * 100) |&gt; cat()\n}\n\n## Arredonda um número para 4 casas decimais\nr4 &lt;- function(float) {\n  round(float, digits = 4)\n}\n\n## Arredonda um número para 2 casas decimais\nr2 &lt;- function(float) {\n  round(float, digits = 2)\n}"
+  },
+  {
+    "objectID": "index.html#exercício-1",
+    "href": "index.html#exercício-1",
+    "title": "Trabalho Final",
+    "section": "Exercício 1",
+    "text": "Exercício 1\nDada a oportunidade na questão elementar do primeiro exercício, podemos representar as curvas \\(A\\), \\(B\\) e \\(C\\) usando valores aproximados ao que vemos no gráfico, demonstrando a estabelecendo alguns padrões que se repetirão ao longo deste trabalho.\nPara isso, criaremos uma tibble, uma estrutura de dados similar a um dataframe, que armazena dados em formato tabular. Desta forma podemos relacionar cada curva à sua média e desvio padrão.\n\ncurves &lt;- tibble(\n  curve = c(\"A\", \"B\", \"C\"), # Curva\n  mu = c(45, 60, 45),       # Média\n  sigma = c(2, 3.5, 5),     # Desvio padrão\n)\n\nIremos construir também um vetor x_vector para os valores de \\(x\\) contendo 1000 valores entre 0 e 100.\n\nx_vector &lt;- seq(0, 100, length.out = 1000)\n\nNeste momento, temos as informações necessárias para obter os valores correspondentes no eixo \\(y\\).\nCriaremos uma segunda tibble, density, que terá 3000 linhas, mil para cada curva, com respectivos \\(x\\) e \\(y\\). Embora mais didático pelo menor nível de abstração, esta implementação não seria seria preferível em larga escala, onde o pacote purrr oferece resultados mais eficientes.\n\ndensity &lt;- curves |&gt;\n  # Para estruturar o dataset, repetimos os atributos de cada curva 1000 vezes\n  slice(rep(seq_len(n()), each = length(x_vector))) |&gt;\n  # Adicionamos uma nova coluna, que insere os valores de x para cada linha\n  mutate(x = rep(x_vector, times = nrow(curves))) |&gt;\n  # Finalmente, obtemos o y correspondente na FDP em outra nova coluna\n  mutate(y = dnorm(x, mean = mu, sd = sigma)) |&gt;\n  # Precisamos apenas das colunas curve (A, B ou C), x e y\n  select(curve, x, y)\n\nO resultado do que estabelecemos acima pode ser observado na plotagem dos dados:\n\n\nCódigo\n## Define as posições dos rótulos sobre cada curva\n## A partir do ponto máximo de cada curva, calculamos uma posição um pouco mais\n## à esquerda e abaixo para posicionar os rótulos\nlabel_positions &lt;- curves |&gt;\n  transmute(curve,\n    x = mu - 7,\n    y = dnorm(mu, mean = mu, sd = sigma) - 0.01\n  )\n\n## Plota os dados\nplot &lt;- ggplot(density, aes(x, y, color = curve)) +\n  geom_line(linewidth = 1, show.legend = FALSE) +\n  geom_text(\n    data = label_positions, aes(x = x, y = y, label = curve),\n    size = 6,\n    show.legend = FALSE,\n  ) +\n  labs(\n    title = \"Esboço das Curvas Normais A, B e C\",\n    x = \"\", y = \"\",\n  ) +\n  scale_x_continuous(\n    breaks = seq(0, 100, by = 10),\n    minor_breaks = seq(0, 100, by = 5)\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -25, t = 10, b = 15))\n  )\n\nplot\n\n\n\n\n\n\n\n\n\nMunidos do gráfico, podemos responder às perguntas do enunciado:\n\nQuestão A\nA média maior é a da curva \\(B\\), pois ela está mais deslocada à direita. Sua média fica sobre o ponto \\(60\\) do eixo \\(x\\).\n\n\nCódigo\nbisectors &lt;- curves |&gt;\n  transmute(curve, xintercept = mu)\n\nplot +\n  labs(\n    title = \"Esboço das Curvas Normais A, B e C com linhas de simetria\",\n  ) +\n  geom_vline(\n    data = bisectors,\n    aes(xintercept = xintercept),\n    color = \"#66666666\",\n    linetype = \"dashed\",\n    linewidth = 0.6,\n    show.legend = FALSE\n  )\n\n\n\n\n\n\n\n\n\nAs linhas de simetria nos ajudam a verificar que a média maior está localizada no ponto 60 do eixo \\(x\\), a média da curva \\(B\\). Não há diferença significativa entre os eixos de simetria das curvas \\(A\\) e \\(C\\), ambas com aparente média 45, mas visivelmente à esquerda da média de \\(B\\).\n\n\nQuestão B\nO desvio padrão maior é o da curva \\(C\\), pois seus limites mínimo e máximo atingem um desvio muito mais amplo em relação à média. Isso também indica que o desvio padrão de \\(C\\) deve ser o maior. Observando o esboço, podemos estimar um desvio padrão em torno de \\(5\\)."
+  },
+  {
+    "objectID": "index.html#exercício-2",
+    "href": "index.html#exercício-2",
+    "title": "Trabalho Final",
+    "section": "Exercício 2",
+    "text": "Exercício 2\nO exercício 2 nos apresenta um problema similar, que também se debruça sobre a observação de um esboço. Sabendo que a criação de curvas normais será essencial por todo o trabalho, vamos criar um par de funções que nos permita esboçar curvas normais como a que criamos anteriormente através apenas de seus parâmetros:\n\n\nCódigo\n## Plota o gráfico de uma curva de distribuição normal\nplot_draft &lt;- function(density, curve, properties) {\n  p &lt;- properties\n  mu &lt;- slice_head(curve)$mu\n  sigma &lt;- slice_head(curve)$sigma\n\n  bisectors &lt;- curve |&gt;\n    transmute(curve, xintercept = mu)\n\n  plot &lt;- ggplot(density, aes(x, y)) +\n\n    geom_line(color = \"#00af00\", linewidth = 1, show.legend = FALSE) +\n    geom_vline(\n      data = bisectors,\n      aes(xintercept = xintercept),\n      color = \"#66666666\",\n      linetype = \"dashed\",\n      linewidth = 0.6,\n      show.legend = FALSE\n    ) +\n    annotate(\n     \"text\",\n      x    = mu,\n      y    = dnorm(mu, mean = mu, sd = sigma) * 0.25,\n      label = paste0(\"μ = \", mu),\n      vjust = 0,\n      hjust = -0.25,\n      color = \"darkgreen\"\n    ) +\n    labs(\n      title = paste(\"Esboço da Curva Normal \\\"\", p$name, \"\\\"\", sep = \"\"),\n      x = \"\",\n      y = \"\"\n    ) +\n    scale_x_continuous(\n      breaks = seq(p$x_min, p$x_max, by = p$x_step),\n      minor_breaks = seq(p$x_min, p$x_max, by = p$x_step / 2),\n      labels = label_number(accuracy = 0.1),\n    ) +\n    scale_y_continuous(\n      limits = c(0, max(density$y) * p$y_max_multiplier)\n    ) +\n    theme_minimal(base_size = 13) +\n    theme(plot.title = element_text(margin = margin(l = -25, t = 10, b = 15)))\n\n  plot\n}\n\n\n\ndraft &lt;- function(name, mu, sigma, x_min, x_max, x_step, y_max_multiplier = 1) {\n\n    curve &lt;- tibble(\n      curve = name,\n      mu = mu,\n      sigma = sigma,\n    )\n\n    x_vector &lt;- seq(x_min, x_max, length.out = 1000)\n\n    density &lt;- curve |&gt;\n      slice(rep(seq_len(n()), each = length(x_vector))) |&gt;\n      mutate(x = x_vector) |&gt;\n      mutate(y = dnorm(x, mean = mu, sd = sigma)) |&gt;\n      select(curve, x, y)\n\n    graph_properties &lt;- list(\n      name = name,\n      x_min = x_min,\n      x_max = x_max,\n      x_step = x_step,\n      y_max_multiplier = y_max_multiplier\n    )\n\n    plot_draft(density, curve, graph_properties)\n  }\n\nNossa função pode ser usada da seguinte forma:\n\ndraft(\n  name = \"Notas\",\n  mu = 655,\n  sigma = 25,\n  x_min = 580,\n  x_max = 730,\n  x_step = 20,\n  y_max_multiplier = 1.8\n)\n\n\n\n\n\n\n\n\nPodemos responder, pela observação do gráfico, que a nota média é de 655.\nAinda observando o gráfico, podemos ver aproximadamente os pontos de inflexão em 630 e 680, o que sugere um desvio padrão de \\(\\sigma = 25\\)."
+  },
+  {
+    "objectID": "index.html#exercício-3",
+    "href": "index.html#exercício-3",
+    "title": "Trabalho Final",
+    "section": "Exercício 3",
+    "text": "Exercício 3\nOs exercícios 3 a 6 apresentam problemas relacionados à área sob a curva normal padrão dado um escore-z.\nA linguagem R já nos fornece a função pnorm, que responde de forma direta à pergunta sobre qual é a área sob a curva dado um \\(z\\) qualquer.\nPara visualizarmos estas informações, iremos criar uma função z_plot para obter ainda um gráfico representando a área.\nNossa função receberá apenas um valor z e dois parâmetros opcionais:\n\nright, que, se fornecido com o valor TRUE, retornará um gráfico com a aŕea à direita de \\(z\\). Caso o valor seja FALSE ou não seja fornecido, ela por padrão retornará um gráfico com a área à esquerda de \\(z\\)\nopposite, que, se fornecido, representa um segundo valor oposto ao primeiro que delimita o fim da área, ou seja, permite encontrar uma região entre dois valores\n\n\n\nCódigo\nz_plot &lt;- function(z, right = FALSE, opposite = NULL) {\n\nopp &lt;- if (is.null(opposite)) if (right) 4 else -4 else opposite\n\n## Cria um conjunto de 400 valores para x entre -4 e 4\nx_vals &lt;- seq(-4, 4, length.out = 400)\n\n## Cria uma tibble com os valores de x e seus equivalentes em y\npairs &lt;- tibble(x = x_vals, y = dnorm(x_vals))\n\nplot &lt;- ggplot(\n  # Traça a curva usando os valores de x e y\n  pairs, aes(x, y)) +\n  geom_line(linewidth = 0.5, color = \"#0000006f\") +\n  geom_area(\n    # Obtém apenas a área onde x &lt;= z\n    data = subset(pairs, if (right) (x &gt;= z & x &lt;= opp) else (x &gt;= opp & x &lt;= z)),\n    aes(x, y),\n    # Colore a área obtida em verde\n    fill = \"darkgreen\", alpha = 0.4\n  ) +\n  # Traça uma linha perpendicular a x sobre z\n  geom_vline(xintercept = z, linetype = \"dashed\", color = \"darkgreen\") +\n    labs(\n      x = \"z\",\n      y = \"Densidade de probabilidade\"\n    ) +\n  # Demais parâmetros para a aparência e tamanho do gráfico\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 10, l = 0, unit = \"pt\")\n    )\n  )\n\n  plot &lt;- if (!is.null(opposite)) {\n    plot +\n      # Adiciona título e rótulos dos eixos\n      labs(\n        title = paste(\"Área entre os escores-z\", r4(z), \"e\", r4(opp)),\n      ) +\n      geom_vline(\n        xintercept = opp,\n        linetype = \"dashed\",\n        color = \"darkgreen\"\n      ) +\n      annotate(\n        \"text\",\n        x = z, y = dnorm(z) * 0.5,\n        label = sprintf(\"%.3f\", z),\n        size = 3,\n        vjust = -0.4,\n        hjust = -0.1,\n        color = \"darkgreen\"\n      ) +\n      annotate(\n        \"text\",\n        x = opp, y = dnorm(opp) * 0.5,\n        label = sprintf(\"%.3f\", opp),\n        size = 3,\n        vjust = -0.4,\n        hjust = -0.1,\n        color = \"darkgreen\"\n      ) +\n      annotate(\n        \"text\",\n        x = 0.5, y = dnorm(0),\n        label = sprintf(\n          \"P(%.2f ≤ z ≤ %.2f) = %.4f\",\n          if (z &lt; opp) z else opp,\n          if (z &gt; opp) z else opp,\n          abs(pnorm(z) - pnorm(opp))\n        ),\n        size = 3,\n        vjust = -0.4,\n        hjust = -0.1,\n        color = \"darkgreen\"\n    )\n  } else {\n    plot +\n    # Adiciona título e rótulos dos eixos\n    labs(\n      title = paste(\"Área acumulada para o escore-z\", r4(z)),\n    ) +\n    # Anota o valor correspondente à área\n    annotate(\n      \"text\",\n      x = z, y = dnorm(z) * 0.5,\n      label = sprintf(\"P(z ≤ %.2f) = %.4f\", z, pnorm(z, lower.tail = !right)),\n      size = 3,\n      vjust = -0.4,\n      hjust = -0.1,\n      color = \"darkgreen\"\n    )\n  }\n  plot\n}\n\n\n\nQuestão A\nA função pnorm responde à pergunta sobre a área acumulada sob a curva normal padrão à esquerda de \\(-2.19\\), que é igual a \\(0.01426212\\) ou aproximadamente \\(1.43\\%\\).\npnorm(-2.19) |&gt; ppercent()\n\\[P = 0.014262 \\approx 1.43\\%\\]\nPodemos também representar esta área visualmente usando a função z_plot que acabamos de definir:\n\nz_plot(-2.19)\n\n\n\n\n\n\n\n\n\n\nQuestão B\nPara 2.17, temos:\npnorm(2.17) |&gt; ppercent()\n\\[P = 0.984997 \\approx 98.50\\%\\]\nQue pode ser representado como:\n\nz_plot(2.17)"
+  },
+  {
+    "objectID": "index.html#exercício-4",
+    "href": "index.html#exercício-4",
+    "title": "Trabalho Final",
+    "section": "Exercício 4",
+    "text": "Exercício 4\n\nQuestão A\n\nz_plot(2.13)\n\n\n\n\n\n\n\n\n\n\nQuestão B\npnorm(2.13) |&gt; ppercent()\n\\[P = 0.983414 \\approx 98.34\\%\\]"
+  },
+  {
+    "objectID": "index.html#exercício-5",
+    "href": "index.html#exercício-5",
+    "title": "Trabalho Final",
+    "section": "Exercício 5",
+    "text": "Exercício 5\n\nQuestão A\nPara encontrar a área à direita de um determinado ponto podemos subtrair o mesmo resultado obtido com pnorm de 1:\n\n1 - pnorm(-2.16)\n\n[1] 0.9846137\n\n\nOu podemos usar a opção lower.tail = FALSE, fornecida pela própria função:\npnorm(-2.16, lower.tail = FALSE) |&gt; ppercent()\n\\[P = 0.984614 \\approx 98.46\\%\\]\nA curva normal padrão com a área sob a curva à direita de \\(z = -2.16\\) também pode ser obtida com a função que definimos, z_plot. Desta vez usamos o parâmetro opcional right com o valor TRUE, o que retorna o gráfico com a área à direita de \\(z\\) em destaque:\n\nz_plot(-2.16, right = TRUE)\n\n\n\n\n\n\n\n\n\n\nQuestão B\npnorm(-2.16) |&gt; ppercent()\n\\[P = 0.015386 \\approx 1.54\\%\\]\n\n\nQuestão C\n\n1 - pnorm(-2.16)\n\n[1] 0.9846137"
+  },
+  {
+    "objectID": "index.html#exercício-6",
+    "href": "index.html#exercício-6",
+    "title": "Trabalho Final",
+    "section": "Exercício 6",
+    "text": "Exercício 6\nNo exercício 6, precisamos encontrar a área entre \\(z = -2.165\\) e \\(z = -1.35\\), isto é:\n\\[\n  P(-2.165 &lt; z &lt; -1.35)\n\\]\n\nQuestão A\n\nz_plot(-2.165, right = TRUE, opposite = -1.35)\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\npnorm(-1.35)\n\n[1] 0.08850799\n\n\n\n\nQuestão C\n\npnorm(-2.165)\n\n[1] 0.01519384\n\n\n\n\nQuestão D\n\npnorm(-1.35) - pnorm(-2.165)\n\n[1] 0.07331415\n\n\n\n\nQuestão E\nSeja \\(P\\) a função de distribuição acumulada,\n\\[ z_1 = -2.165 \\] \\[ z_2 = -1.35 \\] \\[ \\because \\; z_1 &lt; z_2 \\; \\therefore \\; P(z_1 &lt; z &lt; z_2) = P(z_2) - P(z_1) \\]\n\\[ P(z_1) = 0.0151938 \\] \\[ P(z_2) = 0.088508 \\] \\[ P = 0.088508 - 0.0151938 \\]\n\\[P = 0.073314 \\approx 7.33\\%\\]\nInterpretação: A probabilidade de que a média encontre-se entre \\(-2.165\\) e \\(-1.35\\) é de aproximadamente \\(7.33\\%\\)."
+  },
+  {
+    "objectID": "index.html#exercício-7",
+    "href": "index.html#exercício-7",
+    "title": "Trabalho Final",
+    "section": "Exercício 7",
+    "text": "Exercício 7\n\\[ \\mu = 67 \\] \\[ \\sigma = 3.5 \\] \\[ S = P( x &gt; 70) \\]\nPodemos agregar estes valores em uma lista para acesso posterior:\n\ne7 &lt;- list(\n  mu = 67,\n  sigma = 3.5,\n  x = 70\n)\n\n\nQuestão A\n\ndraft(\n  name = \"Velocidade\",\n  mu = e7$mu,\n  sigma = e7$sigma,\n  x_min = e7$mu - e7$sigma * 3.5,\n  x_max = e7$mu + e7$sigma * 3.5,\n  x_step = ceiling(e7$sigma / 2),\n)\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\nz &lt;- (e7$x - e7$mu) / e7$sigma\nz\n\n[1] 0.8571429\n\n\n\n\nQuestão C\n(1 - pnorm(z)) |&gt; ppercent()\n\\[P = 0.195683 \\approx 19.57\\%\\]\n\nz_plot(z, right = TRUE)\n\n\n\n\n\n\n\n\n\n\nQuestão D\nInterpretação: A probabilidade de que um veículo aleatório ultrapasse a velocidade máxima de 70 milhas por hora é de aproximadamente \\(7.33\\%\\)."
+  },
+  {
+    "objectID": "index.html#exercício-8",
+    "href": "index.html#exercício-8",
+    "title": "Trabalho Final",
+    "section": "Exercício 8",
+    "text": "Exercício 8\n\\[ \\mu = 45 \\] \\[ \\sigma = 12 \\] \\[ S = P(33 ≤ x ≤ 60) \\]\n\ne8 &lt;- list(\n  mu = 45,\n  sigma = 12,\n  x1 = 33,\n  x2 = 60\n)\n\n\nQuestão A\n\ndraft(\n  name = \"Permanência\",\n  mu = e8$mu,\n  sigma = e8$sigma,\n  x_min = e8$mu - e8$sigma * 3.5,\n  x_max = e8$mu + e8$sigma * 3.5,\n  x_step = ceiling(e8$sigma / 2),\n)\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\nz1 &lt;- (e8$x1 - e8$mu) / e8$sigma\nz1\n\n[1] -1\n\n\n\nz2 &lt;- (e8$x2 - e8$mu) / e8$sigma\nz2\n\n[1] 1.25\n\n\n\n\nQuestão C\np &lt;- abs(pnorm(z2) - pnorm(z1))\np |&gt; ppercent()\n\\[P = 0.735695 \\approx 73.57\\%\\]\n\nz_plot(z2, opposite = z1)\n\n\n\n\n\n\n\n\n\n\nQuestão D\nInterpretação: A probabilidade \\(p\\) de que um consumidor fique na loja entre 33 e 60 minutos é de aproximadamente \\(0.735695\\), ou \\(73.57\\%\\). Para 150 consumidores aleatórios, espera-se que aproximadamente \\(150 \\cdot p = 111\\) consumidores permaneceriam na loja entre 33 e 60 minutos."
+  },
+  {
+    "objectID": "index.html#exercício-9",
+    "href": "index.html#exercício-9",
+    "title": "Trabalho Final",
+    "section": "Exercício 9",
+    "text": "Exercício 9\nNão há informação suficiente no enunciado para obter a probabilidade de que este evento ocorra."
+  },
+  {
+    "objectID": "index.html#exercício-10",
+    "href": "index.html#exercício-10",
+    "title": "Trabalho Final",
+    "section": "Exercício 10",
+    "text": "Exercício 10\n\nQuestão 10.1\nA função qnorm pode fornecer um escore-z correspondente a uma dada probabilidade.\n\nz &lt;- qnorm(0.9616)\nz\n\n[1] 1.769563\n\n\n\n\nQuestão 10.2\nSeja \\(\\alpha\\) o valor restante, de \\(0.05\\), podemos obter o escore-z da diferença entre 1 e \\(\\alpha \\over 2\\):\n\nalpha &lt;- 0.05\nz95 &lt;- qnorm(1 - alpha/2)\nz95\n\n[1] 1.959964\n\n\n\n\nQuestão 10.2 A\n\npnorm(z95)\n\n[1] 0.975\n\n\nA área acumulada é de 0.975.\n\n\nQuestão 10.2 B\n\nqnorm(pnorm(z95))\n\n[1] 1.959964\n\n\nA área corresponde a 1.959964 na tabela padrão.\n\n\nQuestão 10.2 C\nO escore-z correspondente é qnorm(1 - alpha/2) , \\(1.959964\\)."
+  },
+  {
+    "objectID": "index.html#exercício-11",
+    "href": "index.html#exercício-11",
+    "title": "Trabalho Final",
+    "section": "Exercício 11",
+    "text": "Exercício 11\n\nQuestões A a C\nPodemos obter cada percentil pela porcentagem ainda através da função qnorm.\n\np10 &lt;- qnorm(0.1)\np20 &lt;- qnorm(0.2)\np99 &lt;- qnorm(0.99)\n\np10\n\n[1] -1.281552\n\np20\n\n[1] -0.8416212\n\np99\n\n[1] 2.326348\n\n\nTemos, portanto:\n\\[ P_{10} = -1.2815516 \\] \\[ P_{20} = -0.8416212 \\] \\[ P_{99} = 2.3263479 \\]"
+  },
+  {
+    "objectID": "index.html#exercício-12",
+    "href": "index.html#exercício-12",
+    "title": "Trabalho Final",
+    "section": "Exercício 12",
+    "text": "Exercício 12\n\\[ \\mu = 52 \\] \\[ \\sigma = 15 \\]\n\nQuestão A\n\ne12 &lt;- list(\n  mu = 52,\n  sigma = 15,\n  x1 = NULL,\n  x2 = NULL,\n  x2 = NULL,\n  z1 = -2.33,\n  z2 = 3.1,\n  z3 = 0.58\n)\n\n\n\nCódigo\ndraft(\n  name = \"Pesos\",\n  mu = e12$mu,\n  sigma = e12$sigma,\n  x_min = e12$mu - e12$sigma * 3.5,\n  x_max = e12$mu + e12$sigma * 3.5,\n  x_step = ceiling(e12$sigma / 2),\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\nPodemos inverter a fórmula para obter um escore-z e teremos:\n\\[\nx = \\mu + \\sigma \\cdot z\n\\]\nPortanto, para cada \\(z_n\\) em \\(\\{ -2.33, 3.1, 0.58 \\}\\), podemos obter um \\(x_n\\):\n\ne12$x1 &lt;- e12$mu + e12$sigma * e12$z1\ne12$x1\n\n[1] 17.05\n\ne12$x2 &lt;- e12$mu + e12$sigma * e12$z2\ne12$x2\n\n[1] 98.5\n\ne12$x3 &lt;- e12$mu + e12$sigma * e12$z3\ne12$x3\n\n[1] 60.7\n\n\n\n\nQuestão C\nOs pesos correspondentes são:\n\\[ z_1 = -2.33 \\rightarrow x_1 = 17.05 \\] \\[ z_2 = 3.1 \\rightarrow x_2 = 98.5 \\] \\[ z_3 = 0.58 \\rightarrow x_3 = 60.7 \\]"
+  },
+  {
+    "objectID": "index.html#exercício-13",
+    "href": "index.html#exercício-13",
+    "title": "Trabalho Final",
+    "section": "Exercício 13",
+    "text": "Exercício 13\n\\[ \\mu = 129 \\] \\[ \\sigma = 5.18 \\]\n\nQuestão A\n\ne13 &lt;- list(\n  mu = 129,\n  sigma = 5.18,\n  x = NULL,\n  z = NULL\n)\n\n\n\nCódigo\ndraft(\n  name = \"Frenagem\",\n  mu = e13$mu,\n  sigma = e13$sigma,\n  x_min = e13$mu - e13$sigma * 3.5,\n  x_max = e13$mu + e13$sigma * 3.5,\n  x_step = ceiling(e13$sigma),\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\nPodemos encontrar o escore-z para \\(0.01\\) também com a função qnorm:\n\ne13$z &lt;- qnorm(0.01)\ne13$z\n\n[1] -2.326348\n\n\n\nz_plot(e13$z)\n\n\n\n\n\n\n\n\n\n\nQuestão C\nMais uma vez, podemos usar:\n\\[ x = \\mu + \\sigma \\cdot z \\]\nTeremos:\n\\[ x = 129 + 5.18 \\cdot -2.3263479 \\]\n\ne13$x &lt;- e13$mu + e13$sigma * e13$z\ne13$x\n\n[1] 116.9495\n\n\n\n\nQuestão D\nInterpretação: A maior distância de frenagem que carro um aleatório poderia ter e ainda estar no grupo dos 1% mais baixos é de aproximadamente 116.95 pés."
+  },
+  {
+    "objectID": "index.html#exercício-14",
+    "href": "index.html#exercício-14",
+    "title": "Trabalho Final",
+    "section": "Exercício 14",
+    "text": "Exercício 14\n\ne14 &lt;- list(\n  mu = 11.2,\n  sigma = 2.1,\n  p = 0.1,\n  x = NULL,\n  z = NULL\n)\n\n\nQuestão A\n\\[ \\mu = 11.2 \\] \\[ \\sigma = 2.1 \\]\n\n\nCódigo\ndraft(\n  name = \"Tempo de Trabalho\",\n  mu = e14$mu,\n  sigma = e14$sigma,\n  x_min = e14$mu - e14$sigma * 3.5,\n  x_max = e14$mu + e14$sigma * 3.5,\n  x_step = ceiling(e14$sigma / 2),\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\nA função qnorm novamente pode nos ajudar a encontrar o escore-z para \\(0.1\\):\n\ne14$z &lt;- qnorm(e14$p)\ne14$z\n\n[1] -1.281552\n\n\n\nz_plot(e14$z)\n\n\n\n\n\n\n\n\n\n\nQuestão C\nNovamente, pela fórmula:\n\\[ x = \\mu + \\sigma \\cdot z \\]\nTeremos:\n\\[ x = 11.2 + 2.1 \\cdot -1.2815516 \\]\n\ne14$x &lt;- e14$mu + e14$sigma * e14$z\ne14$x\n\n[1] 8.508742\n\n\n\n\nQuestão D\nInterpretação: O tempo máximo que um funcionário pode ter trabalhado na empresa e ainda assim ser demitido é de aproximadamente 8 anos e 6 meses."
+  },
+  {
+    "objectID": "index.html#exercício-15",
+    "href": "index.html#exercício-15",
+    "title": "Trabalho Final",
+    "section": "Exercício 15",
+    "text": "Exercício 15\n\n\nCódigo\ne15 &lt;- list(\n  mu = 47,\n  sigma = 9,\n  n = 64,\n  s = NULL\n)\n\n\n\\[ \\mu = 47 = \\overline{x} \\] \\[ \\sigma = 9 \\] \\[ n = 64 \\]\nPara o desvio padrão amostral, temos:\n\ne15$s &lt;- e15$sigma / sqrt(e15$n)\n\n\\[ s = 1.125 \\]\n\\[ \\because \\; n \\ge 30 \\; \\therefore \\;\n\\overline{X} \\sim N(47, 1.125^2) \\]\n\n\nCódigo\ndraft(\n  name = \"Contas de Telefone (Amostral)\",\n  mu = e15$mu,\n  sigma = e15$s,\n  x_min = e15$mu - e15$s * 3.5,\n  x_max = e15$mu + e15$s * 3.5,\n  x_step = ceiling(e15$s / 2),\n)"
+  },
+  {
+    "objectID": "index.html#exercício-16",
+    "href": "index.html#exercício-16",
+    "title": "Trabalho Final",
+    "section": "Exercício 16",
+    "text": "Exercício 16\n\n\nCódigo\ne16 &lt;- list(\n  mu = 3.5,\n  sigma = 0.2,\n  n = 16,\n  s = NULL\n)\n\n\n\\[ \\mu = 3.5 = \\overline{x} \\] \\[ \\sigma = 0.2 \\] \\[ n = 16 \\]\nQuanto ao erro padrão da distribuição amostral (desvio padrão amostral):\n\ne16$s &lt;- e16$sigma / sqrt(e16$n)\n\n\\[ s = 0.05 \\]\nA amostra não é grande o suficiente, mas a população é normalmente distribuída. Logo, podemos usar a distribuição normal:\n\n\nCódigo\ndraft(\n  name = \"Diâmetros (Amostral)\",\n  mu = e16$mu,\n  sigma = e16$s,\n  x_min = e16$mu - e16$s * 3.5,\n  x_max = e16$mu + e16$s * 3.5,\n  x_step = 0.05,\n)"
+  },
+  {
+    "objectID": "index.html#exercício-17",
+    "href": "index.html#exercício-17",
+    "title": "Trabalho Final",
+    "section": "Exercício 17",
+    "text": "Exercício 17\n\n\nCódigo\ne17 &lt;- list(\n  mu = 25,\n  sigma = 1.5,\n  n = 100,\n  x1 = 24.7,\n  x2 = 25.5,\n  s = NULL\n)\n\n\nNota: O valor da amostra repete-se no enunciado, como 50 e 100. Foi presumido o segundo valor, 100, por sua compatibilidade com a pergunta.\n\nQuestão A\n\\[ \\mu = 25 = \\overline{x} \\] \\[ \\sigma = 1.5 \\] \\[ n = 100 \\]\nDesvio padrão amostral:\n\ne17$s &lt;- e17$sigma / sqrt(e17$n)\n\n\\[ s = 0.15 \\]\n\\[ \\because \\; n \\ge 30 \\; \\therefore \\;\n\\overline{X} \\sim N(25, 0.15^2) \\]\n\n\nCódigo\ndraft(\n  name = \"Tempo Dirigindo (Amostral)\",\n  mu = e17$mu,\n  sigma = e17$s,\n  x_min = e17$mu - e17$s * 3.5,\n  x_max = e17$mu + e17$s * 3.5,\n  x_step = e17$s,\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B e C\nAinda precisamos determinar \\(P(24.7 \\lt x \\lt 25.5)\\).\nPodemos obter \\(P\\) através de:\n\\[ P = P(25.5) - P(24.7) \\]\nPodemos usar pnorm novamente para expressar o mesmo em R:\n(pnorm(e17$x2, mean = e17$mu, sd = e17$s) -\npnorm(e17$x1, mean = e17$mu, sd = e17$s)) |&gt;\n  ppercent()\n\\[P = 0.976821 \\approx 97.68\\%\\]\n\n\nQuestão D\nInterpretação: A probabilidade de que o tempo médio que \\(100\\) motoristas aleatórios passem entre \\(24.7\\) e \\(25.5\\) minutos dirigindo é de aproximadamente \\(97.68\\%\\)."
+  },
+  {
+    "objectID": "index.html#exercício-18",
+    "href": "index.html#exercício-18",
+    "title": "Trabalho Final",
+    "section": "Exercício 18",
+    "text": "Exercício 18\n\n\nCódigo\ne18 &lt;- list(\n  mu = 176800,\n  sigma = 50000,\n  n = 12,\n  x = 160000,\n  z = NULL,\n  s = NULL\n)\n\n\n\nQuestão A\n\\[ \\mu = 1.768\\times 10^{5} = \\overline{x} \\] \\[ \\sigma = 5\\times 10^{4} \\] \\[ n = 12 \\]\nDesvio padrão amostral:\n\ne18$s &lt;- e18$sigma / sqrt(e18$n)\n\n\\[ s = 1.4433757\\times 10^{4} \\]\n\n\nCódigo\ndraft(\n  name = \"Residências (Amostral)\",\n  mu = e18$mu,\n  sigma = e18$s,\n  x_min = e18$mu - e18$s * 3.5,\n  x_max = e18$mu + e18$s * 3.5,\n  x_step = e18$s * 2,\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\ne18$z &lt;- (e18$x - e18$mu) / e18$s\n\n\nz_plot(e18$z, right = TRUE)\n\n\n\n\n\n\n\n\n\n\nQuestão C\npnorm(e18$z, lower.tail = FALSE) |&gt; ppercent()\n\\[P = 0.877775 \\approx 87.78\\%\\]\n\n\nQuestão D\nInterpretação: Há uma probabilidade de aproximadamente \\(87.78\\%\\) que o preço de vendas médio seja maior que US$ 160 000."
+  },
+  {
+    "objectID": "index.html#exercício-19",
+    "href": "index.html#exercício-19",
+    "title": "Trabalho Final",
+    "section": "Exercício 19",
+    "text": "Exercício 19\n\n\nCódigo\ne19 &lt;- list(\n  mu = 190,\n  sigma = 48,\n  n = 10,\n  x = 200,\n  z = NULL,\n  z_barra = NULL,\n  s = NULL\n)\n\n\n\\[ \\mu = 190 = \\overline{x} \\] \\[ \\sigma = 48 \\] \\[ n = 10 \\]\nDesvio padrão amostral:\n\ne19$s &lt;- e19$sigma / sqrt(e19$n)\n\n\\[ s = 15.1789328 \\]\n\n\nCódigo\ndraft(\n  name = \"Monitores (Amostral)\",\n  mu = e19$mu,\n  sigma = e19$s,\n  x_min = e19$mu - e19$s * 3.5,\n  x_max = e19$mu + e19$s * 3.5,\n  x_step = ceiling(e19$s / 2),\n)\n\n\n\n\n\n\n\n\n\n\ne19$z &lt;- (e19$x - e19$mu) / e19$sigma\ne19$z_barra &lt;- (e19$x - e19$mu) / e19$s\n\n\nQuestão B\npnorm(e19$z) |&gt; ppercent()\n\\[P = 0.582516 \\approx 58.25\\%\\]\npnorm(e19$z_barra) |&gt; ppercent()\n\\[P = 0.744990 \\approx 74.50\\%\\]\n\nz_plot(e19$z)\n\n\n\n\n\n\n\nz_plot(e19$z_barra)\n\n\n\n\n\n\n\n\n\n\nQuestão C\nA amostra apresenta uma probabilidade maior. Isto é esperado, já que ela restringe a quantidade de casos extremos."
+  },
+  {
+    "objectID": "index.html#exercício-20",
+    "href": "index.html#exercício-20",
+    "title": "Trabalho Final",
+    "section": "Exercício 20",
+    "text": "Exercício 20\n\n\nCódigo\ne20 &lt;- list(\n  n = 100,\n  p = 0.34,\n  q = NULL,\n  np = NULL,\n  nq = NULL\n)\n\n\n\nQuestão A\n\ne20$q &lt;- 1 - e20$p\n\n\\[ n = 100 \\] \\[ p = 0.34 \\] \\[ q = 0.66 \\]\n\n\nQuestão B\n\ne20$np &lt;- e20$n * e20$p\ne20$nq &lt;- e20$n * e20$q\n\n\\[ np = 34 \\] \\[ nq = 66 \\]\n\n\nQuestão C\nPodemos usar uma distribuição normal para aproximar, pois \\(np \\ge 5 \\land nq \\ge 5\\).\n\n\nQuestão D\n\nmu_b &lt;- e20$np\nsigma_b &lt;- sqrt(e20$n * e20$p * e20$q)\n\n\\[ \\mu = 34 \\] \\[ \\sigma = 4.7371 \\]"
+  },
+  {
+    "objectID": "index.html#exercício-21",
+    "href": "index.html#exercício-21",
+    "title": "Trabalho Final",
+    "section": "Exercício 21",
+    "text": "Exercício 21\n\n\nCódigo\ne21 &lt;- list(\n  n = 100,\n  p = 0.34,\n  q = NULL,\n  np = NULL,\n  nq = NULL,\n  mu = NULL,\n  sigma = NULL,\n  z = NULL,\n  ps = NULL,\n  a = NULL\n)\n\n\n\ne21$q &lt;- 1 - e21$p\ne21$np &lt;- e21$n * e21$p\ne21$nq &lt;- e21$n * e21$q\n\n\\[ n = 100 \\] \\[ p = 0.34 \\] \\[ q = 0.66 \\] \\[ np = 34 \\] \\[ nq = 66 \\]\n\nQuestão A\nNovamente podemos usar uma distribuição normal, dado que \\(np \\ge 5 \\land nq \\ge 5\\).\n\n\nQuestão B\n\ne21$mu &lt;- e21$np\ne21$sigma &lt;- sqrt(e21$n * e21$p * e21$q)\n\n\\[ \\mu = 34 \\] \\[ \\sigma = 4.7371 \\]\n\n\nQuestão C\nPara corrigir \\(P(x &gt; 30)\\), usaremos \\(x \\ge 30.5\\).\n\ne21$a &lt;- 30.5\n\n\n\nQuestão D\n\ne21$z &lt;- (e21$a - e21$mu) / e21$sigma\ne21$ps &lt;- pnorm(e21$z, lower.tail = FALSE)\n\n\\[ z = -0.7388506 \\] \\[ P(X &gt; 30) \\approx P(Z &gt; z) = 0.77 \\]\n\nz_plot(e21$z)\n\n\n\n\n\n\n\n\n\n\nCódigo\nx_vector &lt;- seq(e21$mu - 4*e21$sigma, e21$mu + 4*e21$sigma, length.out = 400)\npairs &lt;- tibble(x = x_vector, y = dnorm(\n  x_vector,\n  mean = e21$mu,\n  sd = e21$sigma\n)\n)\n\nggplot(pairs, aes(x, y)) +\n  geom_line(color = \"darkgreen\") +\n  geom_area(data = subset(pairs, x &gt;= e21$a),\n    aes(x, y),\n    fill = \"darkgreen\", alpha = 0.4) +\n  geom_vline(xintercept = e21$a, linetype = \"dashed\") +\n   labs(\n    title = paste(\n      \"Aproximação Normal para Binomial, n =\", e21$n, \"p =\", e21$p\n    ),\n    subtitle = \"Em destaque, P(X &gt; 30) com correção de continuidade\",\n    x = \"X\",\n    y = \"Densidade de probabilidade\"\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )"
+  },
+  {
+    "objectID": "index.html#exercício-22",
+    "href": "index.html#exercício-22",
+    "title": "Trabalho Final",
+    "section": "Exercício 22",
+    "text": "Exercício 22\n\n\nCódigo\ne22 &lt;- list(\n  n = 100,\n  p = 0.58,\n  q = NULL,\n  k = 100,\n  np = NULL,\n  nq = NULL,\n  mu = NULL,\n  sigma = NULL,\n  z = NULL,\n  ps = NULL,\n  a = NULL\n)\n\n\n\ne22$q &lt;- 1 - e22$p\ne22$np &lt;- e22$n * e22$p\ne22$nq &lt;- e22$n * e22$q\n\n\\[ n = 100 \\] \\[ p = 0.58 \\] \\[ q = 0.42 \\] \\[ np = 58 \\] \\[ nq = 42 \\]\n\nQuestão A\nMais uma vez podemos usar uma distribuição normal, dado que \\(np \\ge 5 \\land nq \\ge 5\\).\n\n\nQuestão B\n\ne22$mu &lt;- e22$np\ne22$sigma &lt;- sqrt(e22$n * e22$p * e22$q)\n\n\\[ \\mu = 58 \\] \\[ \\sigma = 4.9356 \\]"
+  },
+  {
+    "objectID": "index.html#exercício-23",
+    "href": "index.html#exercício-23",
+    "title": "Trabalho Final",
+    "section": "Exercício 23",
+    "text": "Exercício 23\n\n\nCódigo\ne23 &lt;- list(\n  n = 75,\n  p = 0.32,\n  q = NULL,\n  x = 15,\n  np = NULL,\n  nq = NULL,\n  mu = NULL,\n  sigma = NULL,\n  xs = NULL,\n  xs = NULL,\n  zs = NULL,\n  zi = NULL,\n  prob = NULL\n)\n\n\n\ne23$q &lt;- 1 - e23$p\ne23$np &lt;- e23$n * e23$p\ne23$nq &lt;- e23$n * e23$q\n\n\\[ n = 75 \\] \\[ p = 0.32 \\] \\[ q = 0.68 \\] \\[ np = 24 \\] \\[ nq = 51 \\]\n\nQuestão A\nAinda podemos usar uma distribuição normal, dado que \\(np \\ge 5 \\land nq \\ge 5\\).\n\n\nQuestão B\n\ne23$mu &lt;- e23$np\ne23$sigma &lt;- sqrt(e23$n * e23$p * e23$q)\n\n\\[ \\mu = 24 \\] \\[ \\sigma = 4.0398 \\]\n\n\nQuestão C\n\ne23$xi &lt;- e23$x - 0.5\ne23$xs &lt;- e23$x + 0.5\n\ne23$zi &lt;- (e23$xi - e23$mu) / e23$sigma\ne23$zs &lt;- (e23$xs - e23$mu) / e23$sigma\n\n\\[ x_i = 14.5 \\] \\[ x_s = 15.5 \\] \\[ z_i = -2.3516004 \\] \\[ z_s = -2.1040635 \\]\n\n\nQuestão D\nPara aproximar \\(P(X = 15)\\) para a distribuição normal:\npnorm(e23$zs) - pnorm(e23$zi) |&gt; ppercent()\n\\[P = 0.009346 \\approx 0.93\\%\\]numeric(0)\n\nz_plot(e23$zs, opposite = e23$zi)"
+  },
+  {
+    "objectID": "index.html#exercício-24",
+    "href": "index.html#exercício-24",
+    "title": "Trabalho Final",
+    "section": "Exercício 24",
+    "text": "Exercício 24\nO problema apresentado neste exercíciio é mais simples por poder ser reduzido a um vetor tal que:\n\nhours &lt;- c(\n  26, 25, 32, 31, 28, 28,\n  28, 22, 28, 25, 21, 40,\n  32, 22, 25, 22, 26, 24,\n  46, 20, 35, 22, 32, 48,\n  32, 36, 38, 32, 22, 19\n)\n\n\nQuestões A e B\nCom isso, podemos obter a média amostral, que corresponde também à média populacional:\n\nx_bar &lt;- mean(hours)\nx_bar\n\n[1] 28.9"
+  },
+  {
+    "objectID": "index.html#exercício-25",
+    "href": "index.html#exercício-25",
+    "title": "Trabalho Final",
+    "section": "Exercício 25",
+    "text": "Exercício 25\n\nQuestão A\nUsando o mesmo vetor, teremos:\n\nn     &lt;- length(hours)      # tamanho da amostra\nsigma &lt;- 7.9                # desvio populacional\nalpha &lt;- 0.05               # 95% de confiança\nz_c   &lt;- qnorm(1 - alpha/2) # z-crítico\n\n\n\nQuestão B\nPodemos obter a margem de erro por \\(z_c \\cdot \\sigma / \\sqrt{n}\\):\n\nE = z_c * sigma / sqrt(n)\n\n\n\nQuestão C\n\\[ n = 30 \\] \\[ \\sigma = 7.9 \\] \\[ \\alpha = 0.05 \\] \\[ z_c = 1.959964 \\] \\[ E = 2.8269267 \\]\nInterpretação: Com 95% de confiança, a média de horas semanais está no intervalo \\((26.31; 31.95)\\)."
+  },
+  {
+    "objectID": "index.html#exercício-26",
+    "href": "index.html#exercício-26",
+    "title": "Trabalho Final",
+    "section": "Exercício 26",
+    "text": "Exercício 26\n\nn &lt;- length(hours)\ns &lt;- sd(hours)\nalpha &lt;- 0.05\nf &lt;- n - 1 # degrees of freedom\nt_c &lt;- qt(1 - alpha/2, f)\n\n\nQuestão A\n\nx_bar &lt;- mean(hours)\nE &lt;- t_c * s / sqrt(n)\n\n\\[ \\overline{x} = 28.9 \\] \\[ E = 2.7480781 \\]\n\n\nQuestão B\n\nli &lt;- x_bar - E\nls &lt;- x_bar + E\n\n\\[ l_i = 26.1519219 \\] \\[ l_s = 31.6480781 \\]\n\n\nQuestão C\nInterpretação: Com 95% de confiança, a média populacional de horas semanais está no intervalo \\((26.15; 31.65)\\)."
+  },
+  {
+    "objectID": "index.html#exercício-27",
+    "href": "index.html#exercício-27",
+    "title": "Trabalho Final",
+    "section": "Exercício 27",
+    "text": "Exercício 27\nNovamente, podemos usar apenas um vetor para os dados:\n\nhours &lt;- c(\n  30, 26, 33, 26, 26, 33, 31, 31, 21, 37,\n  27, 20, 34, 35, 30, 24, 38, 34, 39, 31,\n  22, 30, 23, 23, 31, 44, 31, 33, 33, 26,\n  27, 28, 25, 35, 23, 32, 29, 31, 25, 27\n)\n\nsigma &lt;- 7.9\nE &lt;- 2\nalpha &lt;- 0.05\nz_c &lt;- qnorm(1 - alpha / 2)\n\n\\[ \\sigma = 7.9 \\] \\[ E = 2 \\] \\[ \\alpha = 0.05 \\] \\[ z_c = 1.959964 \\]\nDadas estas informações, podemos obter:\n\\[\n  n = (z_c \\cdot sigma / E)^2\n\\]\n\nn &lt;- ceiling((z_c * sigma / E)^2)\nn\n\n[1] 60\n\n\nInterpretação: Pelo menos 60 funcionários devem ser incluídos na amostra para ter 95% de confiança de que a diferença máxima entre a média amostral e a média populacional seja de 2 horas."
+  },
+  {
+    "objectID": "index.html#exercício-28",
+    "href": "index.html#exercício-28",
+    "title": "Trabalho Final",
+    "section": "Exercício 28",
+    "text": "Exercício 28\n\nQuestão A\nDada uma amostra de \\(n = 22\\), podemos obter o grau de liberdade \\(f = n - 1\\):\n\nn &lt;- 22\nf &lt;- n - 1\n\n\n\nQuestão B\n\nc &lt;- 0.90\n\n\n\nQuestão C\nNovamente, usamos a função qt para obter o valor \\(t_c\\).\n\nalpha &lt;- 1 - c\nt_c &lt;- qt(1 - alpha / 2, f)\n\n\n\nQuestão D\nO valor crítico \\(t_c\\) para um nível de confiança de 90% com uma amostra de 22 é 1.7207429."
+  },
+  {
+    "objectID": "index.html#exercício-29",
+    "href": "index.html#exercício-29",
+    "title": "Trabalho Final",
+    "section": "Exercício 29",
+    "text": "Exercício 29\nPodemos definir as seguintes variáveis a partir do enunciado:\n\nn &lt;- 16\nmu &lt;- 162\ns &lt;- 10\nf &lt;- n - 1\nse &lt;- s / sqrt(n)\n\nCom elas, podemos então construir duas listas, cada uma contendo os limites superiores e inferiores para os intervalos de confiança de 90% e 99%:\n\n## 90%\nalpha90 &lt;- 0.10\nt90 &lt;- qt(1 - alpha90 / 2, f)\ne90 &lt;- t90 * se\nci90 &lt;- list(i = x_bar - e90, s = x_bar + e90)\n\n## 99%\nalpha99 &lt;- 0.01\nt99 &lt;- qt(1 - alpha99 / 2, f)\ne99 &lt;- t99 * se\nci99 &lt;- list(i = x_bar - e99, s = x_bar + e99)\n\nOs valores obtidos mostram:\n\nIntervalo de confiança de 90%\n\nLimite inferior 24.5174\nLimite superior 33.2826\n\nIntervalo de confiança de 99%\n\nLimite inferior 21.5332\nLimite superior 36.2668"
+  },
+  {
+    "objectID": "index.html#exercício-30",
+    "href": "index.html#exercício-30",
+    "title": "Trabalho Final",
+    "section": "Exercício 30",
+    "text": "Exercício 30\nNovamente, podemos definir as seguintes variáveis a partir do enunciado:\n\nn     &lt;- 36\nmu &lt;- 9.75\ns     &lt;- 2.39\nf    &lt;- n - 1\nse    &lt;- s / sqrt(n)\n\n\n## 90%\nt90  &lt;- qt(0.95, f)\ne90  &lt;- t90 * se\nci90 &lt;- list(i = mu - e90, s = x_bar + e90)\n\n## 95%\nt95  &lt;- qt(0.975, f)\ne95  &lt;- t95 * se\nci95 &lt;- list(i = mu - e95, s = x_bar + e95)\n\nTemos, portanto, os intervalos de confiança:\n\nci90\n\n$i\n[1] 9.076987\n\n$s\n[1] 29.57301\n\nci95\n\n$i\n[1] 8.94134\n\n$s\n[1] 29.70866\n\n\n\nQuestão A\n\nIntervalo de confiança de 90%\n\n\\(t_c = 1.6896\\)\n\\(E = 0.673\\)\n\nIntervalo de confiança de 95%\n\n\\(t_c = 2.0301\\)\n\\(E = 0.8087\\)\n\n\n\n\nQuestão B\n\nIntervalo de confiança de 90%\n\nLimite inferior 9.077\nLimite superior 29.573\n\nIntervalo de confiança de 95%\n\nLimite inferior 8.9413\nLimite superior 29.7087\n\n\n\n\nQuestão C\nPodemos comparar as larguras usando uma subtração simples:\n\nIntervalo de confiança de 90%\n\nLargura: 20.496\n\nIntervalo de confiança de 95%\n\nLargura: 20.7673"
+  },
+  {
+    "objectID": "index.html#exercício-31",
+    "href": "index.html#exercício-31",
+    "title": "Trabalho Final",
+    "section": "Exercício 31",
+    "text": "Exercício 31\nComo o desvio padrão da população é desconhecido e temos uma amostra pequena, devemos usar a distribuição \\(t\\) com um índice de liberdade de \\(n - 1\\).\nMais uma vez, vamos primeiro designar algumas variáveis com os valores do enunciado:\n\nn &lt;- 18\nx_bar &lt;- 64\ns &lt;- 2.5\nf &lt;- n - 1\n\nDado o intervalo de confiança de \\(90\\%\\), temos \\(\\alpha = 0.1\\):\n\nalpha &lt;- 0.10\nt_c &lt;- qt(1 - alpha / 2, f)\nse &lt;- s / sqrt(n)\n\nE com isso podemos obter a margem de erro:\n\nme &lt;- t_c * se\n\nNosso intervalo de confiança estará, portanto, entre:\n\nc_i &lt;- x_bar - me\nc_s &lt;- x_bar + me\n\nOu seja, entre 62.9749 e 65.0251."
+  },
+  {
+    "objectID": "index.html#exercício-32",
+    "href": "index.html#exercício-32",
+    "title": "Trabalho Final",
+    "section": "Exercício 32",
+    "text": "Exercício 32\n\nQuestão A\nPelo enunciado, temos:\n\nx &lt;- 123\nn &lt;- 2462\n\n\n\nQuestão B\nPodemos obter \\(\\hat{p}\\) com uma proporção simples de \\(x \\over n\\).\n\np_h &lt;- x / n\n\n\\[ \\hat{p} = 0.0499594\\]"
+  },
+  {
+    "objectID": "index.html#exercício-33",
+    "href": "index.html#exercício-33",
+    "title": "Trabalho Final",
+    "section": "Exercício 33",
+    "text": "Exercício 33\n\nUse os dados do exercício 32 para construir um intervalo de confiança de 90% para a proporção populacional de professores americanos que disseram que “todas ou quase todas” as informações que eles encontram utilizando ferramentas de busca on-line são corretas ou confiáveis.\n\n\nQuestão A\n\nx     &lt;- 123\nn     &lt;- 2462\np_h &lt;- x / n\nq_h &lt;- 1 - p_h\n\n\\[ \\hat{p} = 0.0499594 \\] \\[ \\hat{q} = 0.9500406 \\]\n\n\nQuestão B\n\nnp  &lt;- n * p_h\nnq  &lt;- n * q_h\n\nA distribuição amostral pode ser aproximada por uma distribuição normal pois $ np = 123 nq = 2339 $.\n\n\nQuestão C\n\nz_c &lt;- qnorm(0.95)\ne &lt;- z_c * sqrt(p_h * q_h / n)\n\n\\[ z_c = 1.6448536 \\] \\[ E = 0.0072221 \\]\n\n\nQuestão D\n\nl_i &lt;- p_h - e\nl_s &lt;- p_h + e\n\n\n\nQuestão E\nO intervalo de confiança populacional é aproximadamente (0.0435; 0.0565).\nCom 90% de confiança, entre 4.35% e 5.65% dos professores dos Estados Unidos responderiam “todas ou quase todas”."
+  },
+  {
+    "objectID": "index.html#exercício-34",
+    "href": "index.html#exercício-34",
+    "title": "Trabalho Final",
+    "section": "Exercício 34",
+    "text": "Exercício 34\n\nQuestão A\n\nn &lt;- 498\np_h &lt;- 0.25\nq_h &lt;- 1 - p_h\np_h\n\n[1] 0.25\n\nq_h\n\n[1] 0.75\n\n\n\\[ \\hat{p} = 0.25 \\] \\[ \\hat{q} = 0.75 \\]\n\n\nQuestão B\n\nnp  &lt;- n * p_h\nnq  &lt;- n * q_h\n\nA amostra pode ser aproximada pela distribuição normal dado que $ np = 124.5 nq = 373.5 $.\n\n\nQuestão C\n\nz_c &lt;- qnorm(0.995)\ne &lt;- z_c * sqrt(p_h * q_h / n)\n\n\\[ z_c = 2.5758293 \\] \\[ E = 0.0499808 \\]\n\n\nQuestão D\n\nl_i &lt;- p_h - e\nl_s &lt;- p_h + e\n\n\\[ l_i = 0.2000192 \\] \\[ l_s = 0.2999808 \\]\n\n\nQuestão E\nCom 99% de confiança, a proporção de adultos americanos que consideram pessoas acima de 65 anos os motoristas mais perigosos está entre aproximadamente 20% e 30%."
+  },
+  {
+    "objectID": "index.html#exercício-35",
+    "href": "index.html#exercício-35",
+    "title": "Trabalho Final",
+    "section": "Exercício 35",
+    "text": "Exercício 35\n\nQuestão A\n\np_h1 &lt;- 0.5\nq_h1 &lt;- 1 - p_h1\n\np_h2 &lt;- 0.31\nq_h2 &lt;- 1 - p_h2\n\nz_c &lt;- qnorm(0.95)\ne &lt;- 0.02\n\n\n\nQuestão B\nA partir de,\n\\[ n = ({z_c}^2 \\cdot \\hat{p} \\cdot \\hat{q}) \\over E^2 \\]\nTemos:\n\nn1 &lt;- (z_c^2 * p_h1 * q_h1) / e^2\n\nn2 &lt;- (z_c^2 * p_h2 * q_h2) / e^2\n\n\\[ n_1 = 1690.9646588 \\] \\[ n_2 = 1446.7893621 \\]\n\n\nQuestão C\nDado o domínio da aplicação, precisamos dos valores arredondados:\n\nn1 &lt;- ceiling(n1)\nn2 &lt;- ceiling(n2)\n\nSem estimativa prévia, precisa-se de 1691 pessoas Com \\(\\hat{p} = 0.31\\), precisa-se de 1447 pessoas"
+  },
+  {
+    "objectID": "index.html#exercício-36",
+    "href": "index.html#exercício-36",
+    "title": "Trabalho Final",
+    "section": "Exercício 36",
+    "text": "Exercício 36\n\nEncontre os valores críticos χ2R e χ2L para um intervalo de confiança de 90% quando o tamanho da amostra é 30.\n\n\nQuestão A\n\nn &lt;- 30\nf &lt;- n - 1\nconf &lt;- 0.90\nalpha &lt;- 1 - conf\nf\n\n[1] 29\n\nalpha\n\n[1] 0.1\n\n\n\n\nQuestão B\nAs áreas são \\(0.05\\) à direita e \\(0.05\\) à esquerda.\n\n\nQuestão C\nPodemos usar a distribuição chi quadrado. Na linguagem R, a função qchisq oferece o que precisamos:\n\nc_r &lt;- qchisq(1 - alpha / 2, f)\nc_l &lt;- qchisq(alpha / 2,     f)\n\n\\[ c_r = 42.5569678 \\] \\[ c_l = 17.7083662 \\]\n\n\nQuestão D\nCom 90% de confiança, χ^2 está entre aproximadamente 17.71 e aproximadamente 42.56."
+  },
+  {
+    "objectID": "index.html#exercício-37",
+    "href": "index.html#exercício-37",
+    "title": "Trabalho Final",
+    "section": "Exercício 37",
+    "text": "Exercício 37\n\nQuestão A\n\nn &lt;- 30\nf &lt;- n - 1\ns &lt;- 1.20\n\nconf1 &lt;- 0.90; alpha1 &lt;- 1 - conf1\nconf2 &lt;- 0.95; alpha2 &lt;- 1 - conf2\n\nc_r1 &lt;- qchisq(1 - alpha1 / 2, f)\nc_l1 &lt;- qchisq(alpha1 / 2, f)\n\nc_r2 &lt;- qchisq(1 - alpha2 / 2, f)\nc_l2 &lt;- qchisq(alpha2 / 2, f)\n\n\n\nQuestão B\n\nvar_est &lt;- (f * s^2)\n\n# 90%\nv1_i &lt;- var_est / c_r1\nv1_s &lt;- var_est / c_l1\n\n# 95%\nv2_i &lt;- var_est / c_r2\nv2_s &lt;- var_est / c_l2\n\n\n\nQuestão C\n\nsd1_i &lt;- sqrt(v1_i)\nsd1_s &lt;- sqrt(v1_s)\n\nsd2_i &lt;- sqrt(v2_i)\nsd2_s &lt;- sqrt(v2_s)\n\n\n\nQuestão D\n\nIntervalo de confiança de 90%\n\nPara a variância: 0.98 a 2.36\nPara o desvio padrão: 0.99 a 1.54\n\nIntervalo de confiança de 95%\n\nPara a variância: 0.91 a 2.6\nPara o desvio padrão: 0.96 a 1.61"
+  },
+  {
+    "objectID": "index.html#exercício-38",
+    "href": "index.html#exercício-38",
+    "title": "Trabalho Final",
+    "section": "Exercício 38",
+    "text": "Exercício 38\n\nQuestão A\n\n\\(\\mu \\ne 74\\)\n\\(\\sigma^2 \\le 2.7\\)\n\\(p \\gt 0.24\\)\n\n\n\nQuestão B\n\n\\(\\mu = 74\\)\n\\(\\sigma^2 \\gt 2.7\\)\n\\(p \\ge 0.24\\)\n\n\n\nQuestão C\n\n\\(H_0\\) e \\(H_a\\) para média\n\n\n\\(H_0: \\mu = 74\\)\n\\(H_a: \\mu \\ne 74\\) (afirmação)\n\n\n\\(H_0\\) e \\(H_a\\) para variância\n\n\n\\(H_0: \\sigma^2 \\le 2.7\\) (afirmação)\n\\(H_a: \\sigma^2 \\gt 2.7\\)\n\n\n\\(H_0\\) e \\(H_a\\) para proporção\n\n\n\\(H_0: p \\le 0.24\\)\n\\(H_a: p \\gt 0.24\\) (afirmação)"
+  },
+  {
+    "objectID": "index.html#exercício-39",
+    "href": "index.html#exercício-39",
+    "title": "Trabalho Final",
+    "section": "Exercício 39",
+    "text": "Exercício 39\n\nQuestão A\n\n\\(H_0: p \\le 0.01\\)\n\\(H_a: p \\gt  0.01\\)\n\n\n\nQuestão B\n\nErro tipo I: rejeitar \\(H_0\\) quando \\(p \\le 0.01\\), concluindo que a taxa é \\(\\gt 1\\%\\) quando na realidade é \\(\\le 1\\%\\)\nErro tipo II: não rejeitar \\(H_0\\) quando \\(p \\gt 0.01\\), concluindo que a taxa é \\(\\le 1\\%\\) quando na realidade é \\(\\gt 1\\%\\)\n\n\n\nQuestão C\nO erro tipo II é mais sério."
+  },
+  {
+    "objectID": "index.html#exercício-40",
+    "href": "index.html#exercício-40",
+    "title": "Trabalho Final",
+    "section": "Exercício 40",
+    "text": "Exercício 40\n\nQuestão A\n\nAnalista de consumo\n\n\n\\(H_{0}\\colon \\mu = 74\\)\n\\(H_{a}\\colon \\mu \\neq 74\\)\n\n\nCorretor de imóveis\n\n\n\\(H_{0}\\colon p = 0.24\\)\n\\(H_{a}\\colon p &gt; 0.24\\)\n\n\n\nQuestão B\n\nTeste bilateral: \\(\\mu \\ne 74\\)\n\n\nz0 &lt;- 2.1\np_b &lt;- 2 * (1 - pnorm(abs(z0)))\np_b\n\n[1] 0.03572884\n\n\n\nTeste unilateral à direita: \\(p \\gt 0.24\\)\n\n\nz0 &lt;- 1.5\np_u &lt;- 1 - pnorm(z0)\np_u\n\n[1] 0.0668072\n\n\n\n\nQuestão C\n\nz_plot(qnorm(1 - p_u), right = TRUE)\n\n\n\n\n\n\n\n\n\n\nCódigo\nz_crit &lt;- qnorm(1 - p_b / 2)\npairs &lt;- tibble(x = seq(-4, 4, length.out = 1000))\npairs$y &lt;- dnorm(pairs$x)\n\nggplot(pairs, aes(x, y)) +\n  geom_line() +\n  geom_area(\n    data = subset(pairs, x &lt;= -z_crit), aes(x, y),\n    fill = \"darkgreen\",\n    alpha = 0.5\n  ) +\n  geom_area(\n    data = subset(pairs, x &gt;=  z_crit), aes(x, y),\n    fill = \"darkgreen\",\n    alpha = 0.5\n  ) +\n  geom_vline(xintercept = c(-z_crit, z_crit), linetype = \"dashed\") +\n  labs(\n    title = \"Teste Bilateral\",\n    x = \"z\",\n    y = \"Densidade de probabilidade\"\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )"
+  },
+  {
+    "objectID": "index.html#exercício-41",
+    "href": "index.html#exercício-41",
+    "title": "Trabalho Final",
+    "section": "Exercício 41",
+    "text": "Exercício 41\n\nInterpretação: rejeitar \\(H_0\\)\n\nProporção de estudantes: 61%\n\nHá evidência suficiente para afirmar que a proporção de estudantes em atividades extracurriculares não é 0.61\n\\(\\text{Rejeitar } H_0 \\colon p = 0.61 \\Longrightarrow p \\neq 0.61\\)\n\nTempo médio de troca de óleo é menor que 15 min\n\nHá evidência suficiente para concluir que o tempo médio é menor que 15 minutos\n\\(\\text{Rejeitar } H_0 \\colon \\mu = 15 \\Longrightarrow \\mu \\lt 15\\)\n\n\n\n\nInterpretação: não rejeitar \\(H_0\\)\n\nProporção de estudantes é 61%\n\nNão há evidência suficiente para afirmar que a proporção difere de 0.61\n\nTempo médio de troca de óleo é menor que 15 min\n\nNão há evidência suficiente para afirmar que o tempo médio é menor que 15 minutos"
+  },
+  {
+    "objectID": "index.html#exercício-42",
+    "href": "index.html#exercício-42",
+    "title": "Trabalho Final",
+    "section": "Exercício 42",
+    "text": "Exercício 42\n\nVocê realiza um teste de hipótese para cada uma das afirmações. Como você deveria interpretar sua decisão se rejeitar H0? E se você não rejeitar H0? Ha (afirmação): Um corretor de imóveis divulga que a proporção de proprietários que acham suas casas muito pequenas para suas famílias é mais que 24%.\n\n\nQuestão A\nSe rejeitarmos \\(H_0\\), a interpretação seria de que há evidência suficiente para concluir que a proporção de proprietários que acham suas casas muito pequenas é maior que 24%.\n\n\nQuestão B\nSe não rejeitarmos \\(H_0\\), a interpretação seria de que não há evidência suficiente para concluir que a proporção de proprietários que acham suas casas muito pequenas é maior que 24%."
+  },
+  {
+    "objectID": "index.html#exercício-43",
+    "href": "index.html#exercício-43",
+    "title": "Trabalho Final",
+    "section": "Exercício 43",
+    "text": "Exercício 43\n\nEncontre o valor p para um teste de hipótese unilateral à esquerda com uma estatística de teste padronizada z = –1,71. Decida se rejeita H0 quando o nível de significância é α = 0,05.\n\n\nQuestão A\n\nz &lt;- -1.71\np &lt;- pnorm(z)\np\n\n[1] 0.04363294\n\n\n\n\nQuestão B\nEste valor é o mesmo obtido na questão A, \\(0.0436329\\).\n\n\nQuestão C\nInterpretação: Uma vez que \\(p = 0.0436329 &lt; \\alpha = 0.1\\) , devemos rejeitar \\(H_0\\)."
+  },
+  {
+    "objectID": "index.html#exercício-44",
+    "href": "index.html#exercício-44",
+    "title": "Trabalho Final",
+    "section": "Exercício 44",
+    "text": "Exercício 44\n\nQuestão A\n\nz &lt;- 1.64\np &lt;- pnorm(z)\np\n\n[1] 0.9494974\n\n\n\n\nQuestão B\n\np_2 &lt;- 2 * (1 - pnorm(z))\np_2\n\n[1] 0.1010052\n\n\n\n\nQuestão C\n\\[\n  p = 0.9494974 &gt; \\alpha = 0.10 \\Longrightarrow \\text{Não rejeitar } H_{0}.\n\\]"
+  },
+  {
+    "objectID": "index.html#exercício-45",
+    "href": "index.html#exercício-45",
+    "title": "Trabalho Final",
+    "section": "Exercício 45",
+    "text": "Exercício 45\n\nQuestão A\n\n\\(H_{0}\\colon \\mu = 35\\)\n\\(H_{a}\\colon \\mu &gt; 35\\)\n\n\n\nQuestão B\n\n\\(\\alpha = 0.05\\)\n\n\n\nQuestão C\n\nx_bar &lt;- 36\nmu &lt;- 35\nsigma &lt;- 4\nn &lt;- 100\n\nz &lt;- (x_bar - mu) / (sigma / sqrt(n))\nz\n\n[1] 2.5\n\n\n\n\nQuestão D\n\np &lt;- 1 - pnorm(z)\np\n\n[1] 0.006209665\n\n\n\n\nQuestão E\nDado que \\(p = 0.0062097 &lt; \\alpha = 0.05\\), devemos rejeitar \\(H_0\\).\n\n\nQuestão F\nInterpretação: Há evidência suficiente para concluir que a velocidade média dos veículos ultrapassa 35 milhas por hora."
+  },
+  {
+    "objectID": "index.html#exercício-46",
+    "href": "index.html#exercício-46",
+    "title": "Trabalho Final",
+    "section": "Exercício 46",
+    "text": "Exercício 46\n\nQuestão A\n\nAfirmação: “o tempo médio para recuperar o custo é 3 anos”.\n\\(H_0: \\mu = 3\\)\n\\(H_1: \\mu \\neq 3\\)\n\n\n\nQuestão B\n\nalpha &lt;- 0.01\n\n\n\nQuestão C\n\nx_bar &lt;- 3.3\nmu  &lt;- 3\nsigma &lt;- 0.5\nn &lt;- 25\n\nz &lt;- (x_bar - mu) / (sigma / sqrt(n))\nz\n\n[1] 3\n\n\n\n\nQuestão D\n\np &lt;- 2 * (1 - pnorm(abs(z)))\np\n\n[1] 0.002699796\n\n\n\n\nQuestão E\nComo \\(p \\approx 0.0027 &lt; \\alpha = 0.01\\), devemos rejeitar \\(H_0\\).\n\n\nQuestão F\nInterpretação: Há evidências suficientes de que o tempo médio para recuperar o custo difere de 3 anos. No caso da presente estatística, ele parece ser maior."
+  },
+  {
+    "objectID": "index.html#exercício-47",
+    "href": "index.html#exercício-47",
+    "title": "Trabalho Final",
+    "section": "Exercício 47",
+    "text": "Exercício 47\n\nQuestão A\n\nalpha &lt;- 0.10\n\n\nz_plot(qnorm(alpha))\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\nz &lt;- -1.28\na &lt;- pnorm(z)\na\n\n[1] 0.1002726\n\n\n\n\nQuestão C\n\nz_a &lt;- qnorm(a)\nz_a\n\n[1] -1.28\n\n\n\nz_plot(z_a)\n\n\n\n\n\n\n\n\n\n\nQuestão D\nA zona de rejeição está à esquerda de \\(z = -1.28\\), ou seja, devemos rejeitar se \\(z \\lt -1.28\\)."
+  },
+  {
+    "objectID": "index.html#exercício-48",
+    "href": "index.html#exercício-48",
+    "title": "Trabalho Final",
+    "section": "Exercício 48",
+    "text": "Exercício 48\n\nQuestão A\n\n\nCódigo\nalpha &lt;- 0.08\nz_i &lt;- qnorm(alpha / 2)\nz_s &lt;- qnorm(1 - alpha / 2)\n\ndf &lt;- tibble(x = seq(-4, 4, length.out = 400))\ndf$y &lt;- dnorm(df$x)\n\nggplot(df, aes(x = x, y = y)) +\n  geom_line(linewidth = 1) +\n  geom_ribbon(data = subset(df, x &lt;= z_i),\n              aes(ymin = 0, ymax = y),\n              fill = \"darkgreen\", alpha = 0.5) +\n  geom_ribbon(data = subset(df, x &gt;= z_s),\n              aes(ymin = 0, ymax = y),\n              fill = \"darkgreen\", alpha = 0.5) +\n  geom_vline(xintercept = c(z_i, z_s),\n             linetype = \"dashed\", color = \"darkgreen\") +\n  annotate(\"text\", x = z_i, y = max(df$y) * 0.6,\n           label = paste0(\"z_i = \", round(z_i, 3)),\n           hjust = 1.1, color = \"darkgreen\") +\n  annotate(\"text\", x = z_s, y = max(df$y) * 0.6,\n           label = paste0(\"z_s = \", round(z_s, 3)),\n           hjust = -0.1, color = \"darkgreen\") +\n  labs(\n    title = \"Curva Normal Padrão: α/2 em cada cauda\",\n    x = \"z\",\n    y = \"f(z)\"\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\nalpha &lt;- 0.08\na_i &lt;- pnorm(qnorm(alpha/2))\na_s &lt;- pnorm(qnorm(1 - alpha/2))\n\n\\[ a_i = 0.04 \\] \\[ a_s = 0.96 \\]\n\n\nQuestão C\n\nz_i &lt;- qnorm(0.04)\nz_s &lt;- qnorm(0.96)\nz_i  # -1.750686\n\n[1] -1.750686\n\nz_s  #  1.750686\n\n[1] 1.750686\n\n\n\n\nQuestão D\nRejeitar \\(H_0\\) se \\(z \\lt -1.7506861\\) ou \\(z \\gt 1.7506861\\)."
+  },
+  {
+    "objectID": "index.html#exercício-49",
+    "href": "index.html#exercício-49",
+    "title": "Trabalho Final",
+    "section": "Exercício 49",
+    "text": "Exercício 49\n\nHipóteses\n\n\\(H_0: \\mu = 68000\\)\n\\(H_1: \\mu \\lt 68000\\)\n\n\n\nx_bar  &lt;- 66900\nmu &lt;- 68000\nsigma &lt;- 5500\nn &lt;- 20\n\nz &lt;- (x_bar - mu) / (sigma / sqrt(n))\np &lt;- pnorm(z)\n\n\\[ z = -0.8944272 \\] \\[ p = 0.1855467 \\]\n\\(0.1855467 \\gt \\alpha = 0.05\\), logo, não devemos rejeitar \\(H_0\\).\nInterpretação: Não há evidência suficiente de que o salário médio seja menor que \\(68 000\\)."
+  },
+  {
+    "objectID": "index.html#exercício-50",
+    "href": "index.html#exercício-50",
+    "title": "Trabalho Final",
+    "section": "Exercício 50",
+    "text": "Exercício 50\n\nQuestão A\n\nalpha1 &lt;- 0.1\nalpha2 &lt;- 0.01\n\n\n\nQuestão B\n\nz_1 &lt;- qnorm(1 - alpha1 / 2)\nz_2 &lt;- qnorm(1 - alpha2 / 2)\n\n\\[ z_1 = 1.6448536 \\] \\[ z_2 = 2.5758293 \\]\nAs regiões de rejeição são \\(z \\lt -z_0\\) ou \\(z &gt; z_0\\).\n\n\nQuestão C\n\n\nCódigo\nlibrary(ggplot2)\nalpha &lt;- 0.10\nz0 &lt;- qnorm(1 - alpha / 2)\nx &lt;- seq(-4, 4, length = 400)\ny &lt;- dnorm(x)\nggplot(data.frame(x, y), aes(x, y)) +\n  geom_line() +\n  geom_ribbon(data = subset(data.frame(x, y), x &lt;= -z0),\n    aes(ymin = 0, ymax = y), fill = \"darkgreen\", alpha = 0.5) +\n  geom_ribbon(data = subset(data.frame(x, y), x &gt;=  z0),\n    aes(ymin = 0, ymax = y), fill = \"darkgreen\", alpha = 0.5) +\n  geom_vline(\n    xintercept = c(-z0, z0),\n    linetype = \"dashed\",\n    color = \"darkgreen\"\n  ) +\n  geom_vline(xintercept = z, colour = \"darkgreen\") +\n  labs(title = \"Teste Z bilateral\",\n    subtitle = paste(\"α = 0.1, z = \", round(z, 3))) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )\n\n\n\n\n\n\n\n\n\n\n\nQuestão D\nInterpretação: Com \\(\\alpha = 0.1\\), há evidência suficiente para rejeitar a afirmação de que o custo médio é \\(13960\\) (o custo médio parece menor). Com \\(\\alpha = 0.01\\), não há evidência suficiente para rejeitar a afirmação."
+  },
+  {
+    "objectID": "index.html#exercício-51",
+    "href": "index.html#exercício-51",
+    "title": "Trabalho Final",
+    "section": "Exercício 51",
+    "text": "Exercício 51\n\nQuestão A\n\\[gl = n - 1 = 9 - 1 = 8\\]\n\n\nQuestão B\n\nalpha &lt;- 0.10\nf    &lt;- 8\n\nt0 &lt;- qt(1 - alpha, f)\n\n\\[ t_0 = 1.3968153 \\]"
+  },
+  {
+    "objectID": "index.html#exercício-52",
+    "href": "index.html#exercício-52",
+    "title": "Trabalho Final",
+    "section": "Exercício 52",
+    "text": "Exercício 52\n\nEncontre os valores críticos –t0 e t0 para um teste bilateral para α = 0,05 e n = 16.\n\n\nQuestão A\n\\[gl = n - 1 = 16 - 1 = 15\\]\n\n\nQuestão B\n\nalpha &lt;- 0.05\nf &lt;- 15\n\nt_i &lt;- qt(alpha / 2, f)\nt_s &lt;- qt(1 - alpha / 2, f)\n\n\\[ t_i = -2.1314495 \\] \\[ t_s = 2.1314495 \\]"
+  },
+  {
+    "objectID": "index.html#exercício-53",
+    "href": "index.html#exercício-53",
+    "title": "Trabalho Final",
+    "section": "Exercício 53",
+    "text": "Exercício 53\n\nQuestão A\n\\[ H_0:\\ \\mu = 1200 \\] \\[ H_a:\\ \\mu &lt; 1200 \\]\n\n\nQuestão B\n\nalpha &lt;- 0.1\nn &lt;- 7\nf &lt;- n - 1\n\n\n\nQuestão C\n\nt &lt;- qt(alpha, f)\n\n\\[ t = -1.4397557 \\]\n\n\nQuestão D\n\nx_bar &lt;- 1125\nmu &lt;- 1200\ns &lt;- 55\nn &lt;- 7\n\nt_stat &lt;- (x_bar - mu) / (s / sqrt(n))\np &lt;- pt(t_stat, f)\n\n\\[ t_{stat} = -3.6078427 \\] \\[ p = 0.00563 \\]\n\n\nCódigo\npairs &lt;- tibble(x = seq(-4, 4, length.out = 400))\npairs$y &lt;- dt(pairs$x, df = f)\n\nggplot(pairs, aes(x, y)) +\n  geom_line() +\n  geom_ribbon(data = subset(pairs, x &lt;= t0),\n    aes(ymin = 0, ymax = y),\n    fill = \"darkgreen\", alpha = 0.5) +\n  geom_vline(xintercept = c(t0, t_stat),\n    linetype = \"dashed\",\n    color = c(\"black\", \"darkgreen\")) +\n  annotate(\"text\", x = t0, y = max(pairs$y) * 0.9,\n    label = paste0(\"t0=\", round(t0, 3)),\n    hjust = 1.1, color = \"black\") +\n  annotate(\"text\", x = t_stat, y = max(pairs$y) * 0.7,\n    label = paste0(\"t=\", round(t_stat, 3)),\n    hjust = -0.1, color = \"darkgreen\") +\n  labs(title = \"Distribuição t (df=6)\",\n    subtitle = \"Área à esquerda de t0 = região de rejeição\",\n    x = \"t\", y = \"f(t)\") +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )\n\n\n\n\n\n\n\n\n\n\n\nQuestão E\n\\[ p \\approx 0.044 &lt; \\alpha = 0.1 \\Longrightarrow \\text{ Rejeita } H_0\\]\n\n\nQuestão F\nInterpretação: Há evidência de que o custo médio do seguro é menor que 1200."
+  },
+  {
+    "objectID": "index.html#exercício-54",
+    "href": "index.html#exercício-54",
+    "title": "Trabalho Final",
+    "section": "Exercício 54",
+    "text": "Exercício 54\n\nUma indústria afirma que o nível médio do pH da água em um rio próximo é de 6,8. Você seleciona aleatoriamente 39 amostras de água e mede o pH de cada uma. A média amostral e o desvio padrão são de 6,7 e 0,35, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando nível de significância α = 0,05?\n\nEsta mesma indústria afirma que a condutividade média do rio é de 1.890 mg/l. A condutividade de uma amostra de água é uma medida do total de sólidos dissolvidos na amostra. Você seleciona aleatoriamente 39 amostras de água e mede a condutividade de cada uma. A média e o desvio padrão amostral são de 2.350 mg/l e 900 mg/l, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando o nível de significância α = 0,01?\n\nQuestão A\n\npH\n\n\\[ H_0: \\mu_{pH} &= 6.8 \\]\n\\[ H_a: \\mu_{pH} &\\neq 6.8 \\]\n\n\n\nCondutividade\n\n\\[ H_0: \\mu_{cond} &= 1890 \\]\n\\[ H_a: \\mu_{cond} &\\neq 1890 \\]\n\n\n\n\nQuestão B\n\n\\[ \\text{pH: }&\\alpha = 0.05,\\quad df = 39 - 1 = 38 \\]\n\\[ \\text{Cond: }&\\alpha = 0.01,\\quad df = 39 - 1 = 38 \\]\n\n\n\nQuestão C\n\ndf    &lt;- 38\nt_crit05 &lt;- qt(1 - 0.05 / 2, df)\nt_crit01 &lt;- qt(1 - 0.01 / 2, df)\nt_crit05; -t_crit05\n\n[1] 2.024394\n\n\n[1] -2.024394\n\n# [1]  2.024394 -2.024394\n\nt_crit01; -t_crit01\n\n[1] 2.711558\n\n\n[1] -2.711558\n\n# [1]  2.715158 -2.715158\n\n\n\nQuestão D\n\n# pH\nxbar1 &lt;- 6.7\nmu01  &lt;- 6.8\ns1    &lt;- 0.35\nn1    &lt;- 39\ndf    &lt;- n1 - 1\n\nt1    &lt;- (xbar1 - mu01) / (s1 / sqrt(n1))\np1    &lt;- 2 * pt(-abs(t1), df)\n\n# condutividade\nxbar2 &lt;- 2350\nmu02  &lt;- 1890\ns2    &lt;- 900\nn2    &lt;- 39\n\nt2    &lt;- (xbar2 - mu02) / (s2 / sqrt(n2))\np2    &lt;- 2 * pt(-abs(t2), df)\n\nt1; p1\n\n[1] -1.784285\n\n\n[1] 0.08236385\n\n# t1 ≈ -1.786, p1 ≈ 0.081\n\nt2; p2\n\n[1] 3.191888\n\n\n[1] 0.002835512\n\n# t2 ≈ 3.190,  p2 ≈ 0.0029\n\n\n\nCódigo\npairs &lt;- data.frame(x = seq(-4, 4, length.out = 400))\npairs$y &lt;- dt(pairs$x, df = df)\n\nggplot(pairs, aes(x, y)) +\n  geom_line() +\n  geom_vline(xintercept = c(-t_crit05, t_crit05, t1),\n             linetype = \"dashed\",\n             color = c(\"red\", \"red\",\"darkgreen\")) +\n  annotate(\"text\", x = t1, y = max(pairs$y) * 0.7,\n           label = paste0(\"t1=\", round(t1, 3)),\n           color = \"blue\") +\n  labs(title = \"Teste t bilateral para pH\",\n       subtitle = paste(\"t1 =\", round(t1, 3),\n                        \" | região de rejeição |t| &gt; 2.0244\"),\n       x = \"t\", y = \"f(t)\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\n\n\nQuestão E\n\npH (\\(\\alpha = 0.05\\))\n\n\\(p_1 \\approx 0.081 &gt; 0.05 \\Longrightarrow\\) Não rejeita \\(H_0\\)\n\nCondutividade (\\(\\alpha = 0.01\\))\n\n\\(p_2 \\approx 0.0029 &gt; 0.01 \\Longrightarrow\\) Rejeita \\(H_0\\)\n\n\n\n\nQuestão F\nInterpretação: - pH: Não há evidência suficiente para rejeitar a afirmação de nível médio 6.8. - Condutividade: Há evidência suficiente para rejeitar a afirmação de média 1890 mg/L."
+  },
+  {
+    "objectID": "L2.html",
+    "href": "L2.html",
+    "title": "Trabalho Final",
+    "section": "",
+    "text": "Este trabalho foi elaborado para a disciplina de Estatística e Probabilidade, sob orientação do Prof. Dr. Cleverson Pinheiro, como parte curso de Análise e Desenvolvimento de Sistemas do Instituto Federal de São Paulo, Campus Jacareí. Ele foi desenvolvido utilizando a linguagem de programação R, a ferramenta de publicação Quarto e o conjunto de pacotes tidyverse.\nO código fonte correspondente a este documento está também disponível no GitHub, no repositório jultty/ESPR-final. Ele pode ser visualizado em sua versão como página web em jultty.github.io/ESPR-final.\n\nSoftwares utilizados e versões:\n\nR 4.2.2, de 10 de novembro de 2022\nQuarto 1.7.32, de 16 de junho de 2025\ntidyverse 2.0.0, de 22 de fevereiro de 2023, com atualizações de pacotes individuais\n\n\nOs pacotes utilizados podem ser visualizadas na relação abaixo, onde são de fato carregados no ambiente de desenvolvimento.\n\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(tidyr)\nlibrary(scales)\n\nBlocos de código como o exibido acima são utilizados ao longo deste documento. Em algumas ocasiões, eles estão ocultos por terem menor importância para a demonstração da solução – por exemplo, código relacionado estritamente à plotagem de gráficos e não à definição de um cálculo ou algoritmo que de fato informa o gráfico.\nNestes casos, o texto “⯈ Código” aparece onde o código está oculto e apenas seu resultado é exibido, seja ele um número, texto, conjunto de dados ou gráfico. Clicando sobre este texto, é possível expandir e visualizar o código na íntegra:\n\n\nCódigo\nexp(1i * pi) + 1\n\n\n[1] 0+1.224647e-16i\n\n\n\n\nPara manter a consistência com as saídas computacionais, neste trabalho utilizou-se exclusivamente o ponto como marcador de casas decimais."
+  },
+  {
+    "objectID": "L2.html#introdução",
+    "href": "L2.html#introdução",
+    "title": "Trabalho Final",
+    "section": "",
+    "text": "Este trabalho foi elaborado para a disciplina de Estatística e Probabilidade, sob orientação do Prof. Dr. Cleverson Pinheiro, como parte curso de Análise e Desenvolvimento de Sistemas do Instituto Federal de São Paulo, Campus Jacareí. Ele foi desenvolvido utilizando a linguagem de programação R, a ferramenta de publicação Quarto e o conjunto de pacotes tidyverse.\nO código fonte correspondente a este documento está também disponível no GitHub, no repositório jultty/ESPR-final. Ele pode ser visualizado em sua versão como página web em jultty.github.io/ESPR-final.\n\nSoftwares utilizados e versões:\n\nR 4.2.2, de 10 de novembro de 2022\nQuarto 1.7.32, de 16 de junho de 2025\ntidyverse 2.0.0, de 22 de fevereiro de 2023, com atualizações de pacotes individuais\n\n\nOs pacotes utilizados podem ser visualizadas na relação abaixo, onde são de fato carregados no ambiente de desenvolvimento.\n\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(tidyr)\nlibrary(scales)\n\nBlocos de código como o exibido acima são utilizados ao longo deste documento. Em algumas ocasiões, eles estão ocultos por terem menor importância para a demonstração da solução – por exemplo, código relacionado estritamente à plotagem de gráficos e não à definição de um cálculo ou algoritmo que de fato informa o gráfico.\nNestes casos, o texto “⯈ Código” aparece onde o código está oculto e apenas seu resultado é exibido, seja ele um número, texto, conjunto de dados ou gráfico. Clicando sobre este texto, é possível expandir e visualizar o código na íntegra:\n\n\nCódigo\nexp(1i * pi) + 1\n\n\n[1] 0+1.224647e-16i\n\n\n\n\nPara manter a consistência com as saídas computacionais, neste trabalho utilizou-se exclusivamente o ponto como marcador de casas decimais."
+  },
+  {
+    "objectID": "L2.html#funções-utilitárias",
+    "href": "L2.html#funções-utilitárias",
+    "title": "Trabalho Final",
+    "section": "Funções Utilitárias",
+    "text": "Funções Utilitárias\nPrimeiro, podemos definir algumas funções auxiliares que serão úteis ao longo de todo o trabalho.\n\n## Usando notação Latex, mostra um número com seis casas decimais e\n## a porcentagem equivalente com duas casas decimais\nppercent &lt;- function(raw) {\n  sprintf(\"$$P = %.6f \\\\approx %.2f\\\\%%$$\", raw, raw * 100) |&gt; cat()\n}\n\n## Arredonda um número para 4 casas decimais\nr4 &lt;- function(float) {\n  round(float, digits = 4)\n}\n\n## Arredonda um número para 2 casas decimais\nr2 &lt;- function(float) {\n  round(float, digits = 2)\n}"
+  },
+  {
+    "objectID": "L2.html#exercício-1",
+    "href": "L2.html#exercício-1",
+    "title": "Trabalho Final",
+    "section": "Exercício 1",
+    "text": "Exercício 1\nDada a oportunidade na questão elementar do primeiro exercício, podemos representar as curvas \\(A\\), \\(B\\) e \\(C\\) usando valores aproximados ao que vemos no gráfico, demonstrando a estabelecendo alguns padrões que se repetirão ao longo deste trabalho.\nPara isso, criaremos uma tibble, uma estrutura de dados similar a um dataframe, que armazena dados em formato tabular. Desta forma podemos relacionar cada curva à sua média e desvio padrão.\n\ncurves &lt;- tibble(\n  curve = c(\"A\", \"B\", \"C\"), # Curva\n  mu = c(45, 60, 45),       # Média\n  sigma = c(2, 3.5, 5),     # Desvio padrão\n)\n\nIremos construir também um vetor x_vector para os valores de \\(x\\) contendo 1000 valores entre 0 e 100.\n\nx_vector &lt;- seq(0, 100, length.out = 1000)\n\nNeste momento, temos as informações necessárias para obter os valores correspondentes no eixo \\(y\\).\nCriaremos uma segunda tibble, density, que terá 3000 linhas, mil para cada curva, com respectivos \\(x\\) e \\(y\\). Embora mais didático pelo menor nível de abstração, esta implementação não seria seria preferível em larga escala, onde o pacote purrr oferece resultados mais eficientes.\n\ndensity &lt;- curves |&gt;\n  # Para estruturar o dataset, repetimos os atributos de cada curva 1000 vezes\n  slice(rep(seq_len(n()), each = length(x_vector))) |&gt;\n  # Adicionamos uma nova coluna, que insere os valores de x para cada linha\n  mutate(x = rep(x_vector, times = nrow(curves))) |&gt;\n  # Finalmente, obtemos o y correspondente na FDP em outra nova coluna\n  mutate(y = dnorm(x, mean = mu, sd = sigma)) |&gt;\n  # Precisamos apenas das colunas curve (A, B ou C), x e y\n  select(curve, x, y)\n\nO resultado do que estabelecemos acima pode ser observado na plotagem dos dados:\n\n\nCódigo\n## Define as posições dos rótulos sobre cada curva\n## A partir do ponto máximo de cada curva, calculamos uma posição um pouco mais\n## à esquerda e abaixo para posicionar os rótulos\nlabel_positions &lt;- curves |&gt;\n  transmute(curve,\n    x = mu - 7,\n    y = dnorm(mu, mean = mu, sd = sigma) - 0.01\n  )\n\n## Plota os dados\nplot &lt;- ggplot(density, aes(x, y, color = curve)) +\n  geom_line(linewidth = 1, show.legend = FALSE) +\n  geom_text(\n    data = label_positions, aes(x = x, y = y, label = curve),\n    size = 6,\n    show.legend = FALSE,\n  ) +\n  labs(\n    title = \"Esboço das Curvas Normais A, B e C\",\n    x = \"\", y = \"\",\n  ) +\n  scale_x_continuous(\n    breaks = seq(0, 100, by = 10),\n    minor_breaks = seq(0, 100, by = 5)\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -25, t = 10, b = 15))\n  )\n\nplot\n\n\n\n\n\n\n\n\n\nMunidos do gráfico, podemos responder às perguntas do enunciado:\n\nQuestão A\nA média maior é a da curva \\(B\\), pois ela está mais deslocada à direita. Sua média fica sobre o ponto \\(60\\) do eixo \\(x\\).\n\n\nCódigo\nbisectors &lt;- curves |&gt;\n  transmute(curve, xintercept = mu)\n\nplot +\n  labs(\n    title = \"Esboço das Curvas Normais A, B e C com linhas de simetria\",\n  ) +\n  geom_vline(\n    data = bisectors,\n    aes(xintercept = xintercept),\n    color = \"#66666666\",\n    linetype = \"dashed\",\n    linewidth = 0.6,\n    show.legend = FALSE\n  )\n\n\n\n\n\n\n\n\n\nAs linhas de simetria nos ajudam a verificar que a média maior está localizada no ponto 60 do eixo \\(x\\), a média da curva \\(B\\). Não há diferença significativa entre os eixos de simetria das curvas \\(A\\) e \\(C\\), ambas com aparente média 45, mas visivelmente à esquerda da média de \\(B\\).\n\n\nQuestão B\nO desvio padrão maior é o da curva \\(C\\), pois seus limites mínimo e máximo atingem um desvio muito mais amplo em relação à média. Isso também indica que o desvio padrão de \\(C\\) deve ser o maior. Observando o esboço, podemos estimar um desvio padrão em torno de \\(5\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-2",
+    "href": "L2.html#exercício-2",
+    "title": "Trabalho Final",
+    "section": "Exercício 2",
+    "text": "Exercício 2\nO exercício 2 nos apresenta um problema similar, que também se debruça sobre a observação de um esboço. Sabendo que a criação de curvas normais será essencial por todo o trabalho, vamos criar um par de funções que nos permita esboçar curvas normais como a que criamos anteriormente através apenas de seus parâmetros:\n\n\nCódigo\n## Plota o gráfico de uma curva de distribuição normal\nplot_draft &lt;- function(density, curve, properties) {\n  p &lt;- properties\n  mu &lt;- slice_head(curve)$mu\n  sigma &lt;- slice_head(curve)$sigma\n\n  bisectors &lt;- curve |&gt;\n    transmute(curve, xintercept = mu)\n\n  plot &lt;- ggplot(density, aes(x, y)) +\n\n    geom_line(color = \"#00af00\", linewidth = 1, show.legend = FALSE) +\n    geom_vline(\n      data = bisectors,\n      aes(xintercept = xintercept),\n      color = \"#66666666\",\n      linetype = \"dashed\",\n      linewidth = 0.6,\n      show.legend = FALSE\n    ) +\n    annotate(\n     \"text\",\n      x    = mu,\n      y    = dnorm(mu, mean = mu, sd = sigma) * 0.25,\n      label = paste0(\"μ = \", mu),\n      vjust = 0,\n      hjust = -0.25,\n      color = \"darkgreen\"\n    ) +\n    labs(\n      title = paste(\"Esboço da Curva Normal \\\"\", p$name, \"\\\"\", sep = \"\"),\n      x = \"\",\n      y = \"\"\n    ) +\n    scale_x_continuous(\n      breaks = seq(p$x_min, p$x_max, by = p$x_step),\n      minor_breaks = seq(p$x_min, p$x_max, by = p$x_step / 2),\n      labels = label_number(accuracy = 0.1),\n    ) +\n    scale_y_continuous(\n      limits = c(0, max(density$y) * p$y_max_multiplier)\n    ) +\n    theme_minimal(base_size = 13) +\n    theme(plot.title = element_text(margin = margin(l = -25, t = 10, b = 15)))\n\n  plot\n}\n\n\n\ndraft &lt;- function(name, mu, sigma, x_min, x_max, x_step, y_max_multiplier = 1) {\n\n    curve &lt;- tibble(\n      curve = name,\n      mu = mu,\n      sigma = sigma,\n    )\n\n    x_vector &lt;- seq(x_min, x_max, length.out = 1000)\n\n    density &lt;- curve |&gt;\n      slice(rep(seq_len(n()), each = length(x_vector))) |&gt;\n      mutate(x = x_vector) |&gt;\n      mutate(y = dnorm(x, mean = mu, sd = sigma)) |&gt;\n      select(curve, x, y)\n\n    graph_properties &lt;- list(\n      name = name,\n      x_min = x_min,\n      x_max = x_max,\n      x_step = x_step,\n      y_max_multiplier = y_max_multiplier\n    )\n\n    plot_draft(density, curve, graph_properties)\n  }\n\nNossa função pode ser usada da seguinte forma:\n\ndraft(\n  name = \"Notas\",\n  mu = 655,\n  sigma = 25,\n  x_min = 580,\n  x_max = 730,\n  x_step = 20,\n  y_max_multiplier = 1.8\n)\n\n\n\n\n\n\n\n\nPodemos responder, pela observação do gráfico, que a nota média é de 655.\nAinda observando o gráfico, podemos ver aproximadamente os pontos de inflexão em 630 e 680, o que sugere um desvio padrão de \\(\\sigma = 25\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-3",
+    "href": "L2.html#exercício-3",
+    "title": "Trabalho Final",
+    "section": "Exercício 3",
+    "text": "Exercício 3\nOs exercícios 3 a 6 apresentam problemas relacionados à área sob a curva normal padrão dado um escore-z.\nA linguagem R já nos fornece a função pnorm, que responde de forma direta à pergunta sobre qual é a área sob a curva dado um \\(z\\) qualquer.\nPara visualizarmos estas informações, iremos criar uma função z_plot para obter ainda um gráfico representando a área.\nNossa função receberá apenas um valor z e dois parâmetros opcionais:\n\nright, que, se fornecido com o valor TRUE, retornará um gráfico com a aŕea à direita de \\(z\\). Caso o valor seja FALSE ou não seja fornecido, ela por padrão retornará um gráfico com a área à esquerda de \\(z\\)\nopposite, que, se fornecido, representa um segundo valor oposto ao primeiro que delimita o fim da área, ou seja, permite encontrar uma região entre dois valores\n\n\n\nCódigo\nz_plot &lt;- function(z, right = FALSE, opposite = NULL) {\n\nopp &lt;- if (is.null(opposite)) if (right) 4 else -4 else opposite\n\n## Cria um conjunto de 400 valores para x entre -4 e 4\nx_vals &lt;- seq(-4, 4, length.out = 400)\n\n## Cria uma tibble com os valores de x e seus equivalentes em y\npairs &lt;- tibble(x = x_vals, y = dnorm(x_vals))\n\nplot &lt;- ggplot(\n  # Traça a curva usando os valores de x e y\n  pairs, aes(x, y)) +\n  geom_line(linewidth = 0.5, color = \"#0000006f\") +\n  geom_area(\n    # Obtém apenas a área onde x &lt;= z\n    data = subset(pairs, if (right) (x &gt;= z & x &lt;= opp) else (x &gt;= opp & x &lt;= z)),\n    aes(x, y),\n    # Colore a área obtida em verde\n    fill = \"darkgreen\", alpha = 0.4\n  ) +\n  # Traça uma linha perpendicular a x sobre z\n  geom_vline(xintercept = z, linetype = \"dashed\", color = \"darkgreen\") +\n    labs(\n      x = \"z\",\n      y = \"Densidade de probabilidade\"\n    ) +\n  # Demais parâmetros para a aparência e tamanho do gráfico\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 10, l = 0, unit = \"pt\")\n    )\n  )\n\n  plot &lt;- if (!is.null(opposite)) {\n    plot +\n      # Adiciona título e rótulos dos eixos\n      labs(\n        title = paste(\"Área entre os escores-z\", r4(z), \"e\", r4(opp)),\n      ) +\n      geom_vline(\n        xintercept = opp,\n        linetype = \"dashed\",\n        color = \"darkgreen\"\n      ) +\n      annotate(\n        \"text\",\n        x = z, y = dnorm(z) * 0.5,\n        label = sprintf(\"%.3f\", z),\n        size = 3,\n        vjust = -0.4,\n        hjust = -0.1,\n        color = \"darkgreen\"\n      ) +\n      annotate(\n        \"text\",\n        x = opp, y = dnorm(opp) * 0.5,\n        label = sprintf(\"%.3f\", opp),\n        size = 3,\n        vjust = -0.4,\n        hjust = -0.1,\n        color = \"darkgreen\"\n      ) +\n      annotate(\n        \"text\",\n        x = 0.5, y = dnorm(0),\n        label = sprintf(\n          \"P(%.2f ≤ z ≤ %.2f) = %.4f\",\n          if (z &lt; opp) z else opp,\n          if (z &gt; opp) z else opp,\n          abs(pnorm(z) - pnorm(opp))\n        ),\n        size = 3,\n        vjust = -0.4,\n        hjust = -0.1,\n        color = \"darkgreen\"\n    )\n  } else {\n    plot +\n    # Adiciona título e rótulos dos eixos\n    labs(\n      title = paste(\"Área acumulada para o escore-z\", r4(z)),\n    ) +\n    # Anota o valor correspondente à área\n    annotate(\n      \"text\",\n      x = z, y = dnorm(z) * 0.5,\n      label = sprintf(\"P(z ≤ %.2f) = %.4f\", z, pnorm(z, lower.tail = !right)),\n      size = 3,\n      vjust = -0.4,\n      hjust = -0.1,\n      color = \"darkgreen\"\n    )\n  }\n  plot\n}\n\n\n\nQuestão A\nA função pnorm responde à pergunta sobre a área acumulada sob a curva normal padrão à esquerda de \\(-2.19\\), que é igual a \\(0.01426212\\) ou aproximadamente \\(1.43\\%\\).\npnorm(-2.19) |&gt; ppercent()\n\\[P = 0.014262 \\approx 1.43\\%\\]\nPodemos também representar esta área visualmente usando a função z_plot que acabamos de definir:\n\nz_plot(-2.19)\n\n\n\n\n\n\n\n\n\n\nQuestão B\nPara 2.17, temos:\npnorm(2.17) |&gt; ppercent()\n\\[P = 0.984997 \\approx 98.50\\%\\]\nQue pode ser representado como:\n\nz_plot(2.17)"
+  },
+  {
+    "objectID": "L2.html#exercício-4",
+    "href": "L2.html#exercício-4",
+    "title": "Trabalho Final",
+    "section": "Exercício 4",
+    "text": "Exercício 4\n\nQuestão A\n\nz_plot(2.13)\n\n\n\n\n\n\n\n\n\n\nQuestão B\npnorm(2.13) |&gt; ppercent()\n\\[P = 0.983414 \\approx 98.34\\%\\]"
+  },
+  {
+    "objectID": "L2.html#exercício-5",
+    "href": "L2.html#exercício-5",
+    "title": "Trabalho Final",
+    "section": "Exercício 5",
+    "text": "Exercício 5\n\nQuestão A\nPara encontrar a área à direita de um determinado ponto podemos subtrair o mesmo resultado obtido com pnorm de 1:\n\n1 - pnorm(-2.16)\n\n[1] 0.9846137\n\n\nOu podemos usar a opção lower.tail = FALSE, fornecida pela própria função:\npnorm(-2.16, lower.tail = FALSE) |&gt; ppercent()\n\\[P = 0.984614 \\approx 98.46\\%\\]\nA curva normal padrão com a área sob a curva à direita de \\(z = -2.16\\) também pode ser obtida com a função que definimos, z_plot. Desta vez usamos o parâmetro opcional right com o valor TRUE, o que retorna o gráfico com a área à direita de \\(z\\) em destaque:\n\nz_plot(-2.16, right = TRUE)\n\n\n\n\n\n\n\n\n\n\nQuestão B\npnorm(-2.16) |&gt; ppercent()\n\\[P = 0.015386 \\approx 1.54\\%\\]\n\n\nQuestão C\n\n1 - pnorm(-2.16)\n\n[1] 0.9846137"
+  },
+  {
+    "objectID": "L2.html#exercício-6",
+    "href": "L2.html#exercício-6",
+    "title": "Trabalho Final",
+    "section": "Exercício 6",
+    "text": "Exercício 6\nNo exercício 6, precisamos encontrar a área entre \\(z = -2.165\\) e \\(z = -1.35\\), isto é:\n\\[\n  P(-2.165 &lt; z &lt; -1.35)\n\\]\n\nQuestão A\n\nz_plot(-2.165, right = TRUE, opposite = -1.35)\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\npnorm(-1.35)\n\n[1] 0.08850799\n\n\n\n\nQuestão C\n\npnorm(-2.165)\n\n[1] 0.01519384\n\n\n\n\nQuestão D\n\npnorm(-1.35) - pnorm(-2.165)\n\n[1] 0.07331415\n\n\n\n\nQuestão E\nSeja \\(P\\) a função de distribuição acumulada,\n\\[ z_1 = -2.165 \\] \\[ z_2 = -1.35 \\] \\[ \\because \\; z_1 &lt; z_2 \\; \\therefore \\; P(z_1 &lt; z &lt; z_2) = P(z_2) - P(z_1) \\]\n\\[ P(z_1) = 0.0151938 \\] \\[ P(z_2) = 0.088508 \\] \\[ P = 0.088508 - 0.0151938 \\]\n\\[P = 0.073314 \\approx 7.33\\%\\]\nInterpretação: A probabilidade de que a média encontre-se entre \\(-2.165\\) e \\(-1.35\\) é de aproximadamente \\(7.33\\%\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-7",
+    "href": "L2.html#exercício-7",
+    "title": "Trabalho Final",
+    "section": "Exercício 7",
+    "text": "Exercício 7\n\\[ \\mu = 67 \\] \\[ \\sigma = 3.5 \\] \\[ S = P( x &gt; 70) \\]\nPodemos agregar estes valores em uma lista para acesso posterior:\n\ne7 &lt;- list(\n  mu = 67,\n  sigma = 3.5,\n  x = 70\n)\n\n\nQuestão A\n\ndraft(\n  name = \"Velocidade\",\n  mu = e7$mu,\n  sigma = e7$sigma,\n  x_min = e7$mu - e7$sigma * 3.5,\n  x_max = e7$mu + e7$sigma * 3.5,\n  x_step = ceiling(e7$sigma / 2),\n)\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\nz &lt;- (e7$x - e7$mu) / e7$sigma\nz\n\n[1] 0.8571429\n\n\n\n\nQuestão C\n(1 - pnorm(z)) |&gt; ppercent()\n\\[P = 0.195683 \\approx 19.57\\%\\]\n\nz_plot(z, right = TRUE)\n\n\n\n\n\n\n\n\n\n\nQuestão D\nInterpretação: A probabilidade de que um veículo aleatório ultrapasse a velocidade máxima de 70 milhas por hora é de aproximadamente \\(7.33\\%\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-8",
+    "href": "L2.html#exercício-8",
+    "title": "Trabalho Final",
+    "section": "Exercício 8",
+    "text": "Exercício 8\n\\[ \\mu = 45 \\] \\[ \\sigma = 12 \\] \\[ S = P(33 ≤ x ≤ 60) \\]\n\ne8 &lt;- list(\n  mu = 45,\n  sigma = 12,\n  x1 = 33,\n  x2 = 60\n)\n\n\nQuestão A\n\ndraft(\n  name = \"Permanência\",\n  mu = e8$mu,\n  sigma = e8$sigma,\n  x_min = e8$mu - e8$sigma * 3.5,\n  x_max = e8$mu + e8$sigma * 3.5,\n  x_step = ceiling(e8$sigma / 2),\n)\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\nz1 &lt;- (e8$x1 - e8$mu) / e8$sigma\nz1\n\n[1] -1\n\n\n\nz2 &lt;- (e8$x2 - e8$mu) / e8$sigma\nz2\n\n[1] 1.25\n\n\n\n\nQuestão C\np &lt;- abs(pnorm(z2) - pnorm(z1))\np |&gt; ppercent()\n\\[P = 0.735695 \\approx 73.57\\%\\]\n\nz_plot(z2, opposite = z1)\n\n\n\n\n\n\n\n\n\n\nQuestão D\nInterpretação: A probabilidade \\(p\\) de que um consumidor fique na loja entre 33 e 60 minutos é de aproximadamente \\(0.735695\\), ou \\(73.57\\%\\). Para 150 consumidores aleatórios, espera-se que aproximadamente \\(150 \\cdot p = 111\\) consumidores permaneceriam na loja entre 33 e 60 minutos."
+  },
+  {
+    "objectID": "L2.html#exercício-9",
+    "href": "L2.html#exercício-9",
+    "title": "Trabalho Final",
+    "section": "Exercício 9",
+    "text": "Exercício 9\nNão há informação suficiente no enunciado para obter a probabilidade de que este evento ocorra."
+  },
+  {
+    "objectID": "L2.html#exercício-10",
+    "href": "L2.html#exercício-10",
+    "title": "Trabalho Final",
+    "section": "Exercício 10",
+    "text": "Exercício 10\n\nQuestão 10.1\nA função qnorm pode fornecer um escore-z correspondente a uma dada probabilidade.\n\nz &lt;- qnorm(0.9616)\nz\n\n[1] 1.769563\n\n\n\n\nQuestão 10.2\nSeja \\(\\alpha\\) o valor restante, de \\(0.05\\), podemos obter o escore-z da diferença entre 1 e \\(\\alpha \\over 2\\):\n\nalpha &lt;- 0.05\nz95 &lt;- qnorm(1 - alpha/2)\nz95\n\n[1] 1.959964\n\n\n\n\nQuestão 10.2 A\n\npnorm(z95)\n\n[1] 0.975\n\n\nA área acumulada é de 0.975.\n\n\nQuestão 10.2 B\n\nqnorm(pnorm(z95))\n\n[1] 1.959964\n\n\nA área corresponde a 1.959964 na tabela padrão.\n\n\nQuestão 10.2 C\nO escore-z correspondente é qnorm(1 - alpha/2) , \\(1.959964\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-11",
+    "href": "L2.html#exercício-11",
+    "title": "Trabalho Final",
+    "section": "Exercício 11",
+    "text": "Exercício 11\n\nQuestões A a C\nPodemos obter cada percentil pela porcentagem ainda através da função qnorm.\n\np10 &lt;- qnorm(0.1)\np20 &lt;- qnorm(0.2)\np99 &lt;- qnorm(0.99)\n\np10\n\n[1] -1.281552\n\np20\n\n[1] -0.8416212\n\np99\n\n[1] 2.326348\n\n\nTemos, portanto:\n\\[ P_{10} = -1.2815516 \\] \\[ P_{20} = -0.8416212 \\] \\[ P_{99} = 2.3263479 \\]"
+  },
+  {
+    "objectID": "L2.html#exercício-12",
+    "href": "L2.html#exercício-12",
+    "title": "Trabalho Final",
+    "section": "Exercício 12",
+    "text": "Exercício 12\n\\[ \\mu = 52 \\] \\[ \\sigma = 15 \\]\n\nQuestão A\n\ne12 &lt;- list(\n  mu = 52,\n  sigma = 15,\n  x1 = NULL,\n  x2 = NULL,\n  x2 = NULL,\n  z1 = -2.33,\n  z2 = 3.1,\n  z3 = 0.58\n)\n\n\n\nCódigo\ndraft(\n  name = \"Pesos\",\n  mu = e12$mu,\n  sigma = e12$sigma,\n  x_min = e12$mu - e12$sigma * 3.5,\n  x_max = e12$mu + e12$sigma * 3.5,\n  x_step = ceiling(e12$sigma / 2),\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\nPodemos inverter a fórmula para obter um escore-z e teremos:\n\\[\nx = \\mu + \\sigma \\cdot z\n\\]\nPortanto, para cada \\(z_n\\) em \\(\\{ -2.33, 3.1, 0.58 \\}\\), podemos obter um \\(x_n\\):\n\ne12$x1 &lt;- e12$mu + e12$sigma * e12$z1\ne12$x1\n\n[1] 17.05\n\ne12$x2 &lt;- e12$mu + e12$sigma * e12$z2\ne12$x2\n\n[1] 98.5\n\ne12$x3 &lt;- e12$mu + e12$sigma * e12$z3\ne12$x3\n\n[1] 60.7\n\n\n\n\nQuestão C\nOs pesos correspondentes são:\n\\[ z_1 = -2.33 \\rightarrow x_1 = 17.05 \\] \\[ z_2 = 3.1 \\rightarrow x_2 = 98.5 \\] \\[ z_3 = 0.58 \\rightarrow x_3 = 60.7 \\]"
+  },
+  {
+    "objectID": "L2.html#exercício-13",
+    "href": "L2.html#exercício-13",
+    "title": "Trabalho Final",
+    "section": "Exercício 13",
+    "text": "Exercício 13\n\\[ \\mu = 129 \\] \\[ \\sigma = 5.18 \\]\n\nQuestão A\n\ne13 &lt;- list(\n  mu = 129,\n  sigma = 5.18,\n  x = NULL,\n  z = NULL\n)\n\n\n\nCódigo\ndraft(\n  name = \"Frenagem\",\n  mu = e13$mu,\n  sigma = e13$sigma,\n  x_min = e13$mu - e13$sigma * 3.5,\n  x_max = e13$mu + e13$sigma * 3.5,\n  x_step = ceiling(e13$sigma),\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\nPodemos encontrar o escore-z para \\(0.01\\) também com a função qnorm:\n\ne13$z &lt;- qnorm(0.01)\ne13$z\n\n[1] -2.326348\n\n\n\nz_plot(e13$z)\n\n\n\n\n\n\n\n\n\n\nQuestão C\nMais uma vez, podemos usar:\n\\[ x = \\mu + \\sigma \\cdot z \\]\nTeremos:\n\\[ x = 129 + 5.18 \\cdot -2.3263479 \\]\n\ne13$x &lt;- e13$mu + e13$sigma * e13$z\ne13$x\n\n[1] 116.9495\n\n\n\n\nQuestão D\nInterpretação: A maior distância de frenagem que carro um aleatório poderia ter e ainda estar no grupo dos 1% mais baixos é de aproximadamente 116.95 pés."
+  },
+  {
+    "objectID": "L2.html#exercício-14",
+    "href": "L2.html#exercício-14",
+    "title": "Trabalho Final",
+    "section": "Exercício 14",
+    "text": "Exercício 14\n\ne14 &lt;- list(\n  mu = 11.2,\n  sigma = 2.1,\n  p = 0.1,\n  x = NULL,\n  z = NULL\n)\n\n\nQuestão A\n\\[ \\mu = 11.2 \\] \\[ \\sigma = 2.1 \\]\n\n\nCódigo\ndraft(\n  name = \"Tempo de Trabalho\",\n  mu = e14$mu,\n  sigma = e14$sigma,\n  x_min = e14$mu - e14$sigma * 3.5,\n  x_max = e14$mu + e14$sigma * 3.5,\n  x_step = ceiling(e14$sigma / 2),\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\nA função qnorm novamente pode nos ajudar a encontrar o escore-z para \\(0.1\\):\n\ne14$z &lt;- qnorm(e14$p)\ne14$z\n\n[1] -1.281552\n\n\n\nz_plot(e14$z)\n\n\n\n\n\n\n\n\n\n\nQuestão C\nNovamente, pela fórmula:\n\\[ x = \\mu + \\sigma \\cdot z \\]\nTeremos:\n\\[ x = 11.2 + 2.1 \\cdot -1.2815516 \\]\n\ne14$x &lt;- e14$mu + e14$sigma * e14$z\ne14$x\n\n[1] 8.508742\n\n\n\n\nQuestão D\nInterpretação: O tempo máximo que um funcionário pode ter trabalhado na empresa e ainda assim ser demitido é de aproximadamente 8 anos e 6 meses."
+  },
+  {
+    "objectID": "L2.html#exercício-15",
+    "href": "L2.html#exercício-15",
+    "title": "Trabalho Final",
+    "section": "Exercício 15",
+    "text": "Exercício 15\n\n\nCódigo\ne15 &lt;- list(\n  mu = 47,\n  sigma = 9,\n  n = 64,\n  s = NULL\n)\n\n\n\\[ \\mu = 47 = \\overline{x} \\] \\[ \\sigma = 9 \\] \\[ n = 64 \\]\nPara o desvio padrão amostral, temos:\n\ne15$s &lt;- e15$sigma / sqrt(e15$n)\n\n\\[ s = 1.125 \\]\n\\[ \\because \\; n \\ge 30 \\; \\therefore \\;\n\\overline{X} \\sim N(47, 1.125^2) \\]\n\n\nCódigo\ndraft(\n  name = \"Contas de Telefone (Amostral)\",\n  mu = e15$mu,\n  sigma = e15$s,\n  x_min = e15$mu - e15$s * 3.5,\n  x_max = e15$mu + e15$s * 3.5,\n  x_step = ceiling(e15$s / 2),\n)"
+  },
+  {
+    "objectID": "L2.html#exercício-16",
+    "href": "L2.html#exercício-16",
+    "title": "Trabalho Final",
+    "section": "Exercício 16",
+    "text": "Exercício 16\n\n\nCódigo\ne16 &lt;- list(\n  mu = 3.5,\n  sigma = 0.2,\n  n = 16,\n  s = NULL\n)\n\n\n\\[ \\mu = 3.5 = \\overline{x} \\] \\[ \\sigma = 0.2 \\] \\[ n = 16 \\]\nQuanto ao erro padrão da distribuição amostral (desvio padrão amostral):\n\ne16$s &lt;- e16$sigma / sqrt(e16$n)\n\n\\[ s = 0.05 \\]\nA amostra não é grande o suficiente, mas a população é normalmente distribuída. Logo, podemos usar a distribuição normal:\n\n\nCódigo\ndraft(\n  name = \"Diâmetros (Amostral)\",\n  mu = e16$mu,\n  sigma = e16$s,\n  x_min = e16$mu - e16$s * 3.5,\n  x_max = e16$mu + e16$s * 3.5,\n  x_step = 0.05,\n)"
+  },
+  {
+    "objectID": "L2.html#exercício-17",
+    "href": "L2.html#exercício-17",
+    "title": "Trabalho Final",
+    "section": "Exercício 17",
+    "text": "Exercício 17\n\n\nCódigo\ne17 &lt;- list(\n  mu = 25,\n  sigma = 1.5,\n  n = 100,\n  x1 = 24.7,\n  x2 = 25.5,\n  s = NULL\n)\n\n\nNota: O valor da amostra repete-se no enunciado, como 50 e 100. Foi presumido o segundo valor, 100, por sua compatibilidade com a pergunta.\n\nQuestão A\n\\[ \\mu = 25 = \\overline{x} \\] \\[ \\sigma = 1.5 \\] \\[ n = 100 \\]\nDesvio padrão amostral:\n\ne17$s &lt;- e17$sigma / sqrt(e17$n)\n\n\\[ s = 0.15 \\]\n\\[ \\because \\; n \\ge 30 \\; \\therefore \\;\n\\overline{X} \\sim N(25, 0.15^2) \\]\n\n\nCódigo\ndraft(\n  name = \"Tempo Dirigindo (Amostral)\",\n  mu = e17$mu,\n  sigma = e17$s,\n  x_min = e17$mu - e17$s * 3.5,\n  x_max = e17$mu + e17$s * 3.5,\n  x_step = e17$s,\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B e C\nAinda precisamos determinar \\(P(24.7 \\lt x \\lt 25.5)\\).\nPodemos obter \\(P\\) através de:\n\\[ P = P(25.5) - P(24.7) \\]\nPodemos usar pnorm novamente para expressar o mesmo em R:\n(pnorm(e17$x2, mean = e17$mu, sd = e17$s) -\npnorm(e17$x1, mean = e17$mu, sd = e17$s)) |&gt;\n  ppercent()\n\\[P = 0.976821 \\approx 97.68\\%\\]\n\n\nQuestão D\nInterpretação: A probabilidade de que o tempo médio que \\(100\\) motoristas aleatórios passem entre \\(24.7\\) e \\(25.5\\) minutos dirigindo é de aproximadamente \\(97.68\\%\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-18",
+    "href": "L2.html#exercício-18",
+    "title": "Trabalho Final",
+    "section": "Exercício 18",
+    "text": "Exercício 18\n\n\nCódigo\ne18 &lt;- list(\n  mu = 176800,\n  sigma = 50000,\n  n = 12,\n  x = 160000,\n  z = NULL,\n  s = NULL\n)\n\n\n\nQuestão A\n\\[ \\mu = 1.768\\times 10^{5} = \\overline{x} \\] \\[ \\sigma = 5\\times 10^{4} \\] \\[ n = 12 \\]\nDesvio padrão amostral:\n\ne18$s &lt;- e18$sigma / sqrt(e18$n)\n\n\\[ s = 1.4433757\\times 10^{4} \\]\n\n\nCódigo\ndraft(\n  name = \"Residências (Amostral)\",\n  mu = e18$mu,\n  sigma = e18$s,\n  x_min = e18$mu - e18$s * 3.5,\n  x_max = e18$mu + e18$s * 3.5,\n  x_step = e18$s * 2,\n)\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\ne18$z &lt;- (e18$x - e18$mu) / e18$s\n\n\nz_plot(e18$z, right = TRUE)\n\n\n\n\n\n\n\n\n\n\nQuestão C\npnorm(e18$z, lower.tail = FALSE) |&gt; ppercent()\n\\[P = 0.877775 \\approx 87.78\\%\\]\n\n\nQuestão D\nInterpretação: Há uma probabilidade de aproximadamente \\(87.78\\%\\) que o preço de vendas médio seja maior que US$ 160 000."
+  },
+  {
+    "objectID": "L2.html#exercício-19",
+    "href": "L2.html#exercício-19",
+    "title": "Trabalho Final",
+    "section": "Exercício 19",
+    "text": "Exercício 19\n\n\nCódigo\ne19 &lt;- list(\n  mu = 190,\n  sigma = 48,\n  n = 10,\n  x = 200,\n  z = NULL,\n  z_barra = NULL,\n  s = NULL\n)\n\n\n\\[ \\mu = 190 = \\overline{x} \\] \\[ \\sigma = 48 \\] \\[ n = 10 \\]\nDesvio padrão amostral:\n\ne19$s &lt;- e19$sigma / sqrt(e19$n)\n\n\\[ s = 15.1789328 \\]\n\n\nCódigo\ndraft(\n  name = \"Monitores (Amostral)\",\n  mu = e19$mu,\n  sigma = e19$s,\n  x_min = e19$mu - e19$s * 3.5,\n  x_max = e19$mu + e19$s * 3.5,\n  x_step = ceiling(e19$s / 2),\n)\n\n\n\n\n\n\n\n\n\n\ne19$z &lt;- (e19$x - e19$mu) / e19$sigma\ne19$z_barra &lt;- (e19$x - e19$mu) / e19$s\n\n\nQuestão B\npnorm(e19$z) |&gt; ppercent()\n\\[P = 0.582516 \\approx 58.25\\%\\]\npnorm(e19$z_barra) |&gt; ppercent()\n\\[P = 0.744990 \\approx 74.50\\%\\]\n\nz_plot(e19$z)\n\n\n\n\n\n\n\nz_plot(e19$z_barra)\n\n\n\n\n\n\n\n\n\n\nQuestão C\nA amostra apresenta uma probabilidade maior. Isto é esperado, já que ela restringe a quantidade de casos extremos."
+  },
+  {
+    "objectID": "L2.html#exercício-20",
+    "href": "L2.html#exercício-20",
+    "title": "Trabalho Final",
+    "section": "Exercício 20",
+    "text": "Exercício 20\n\n\nCódigo\ne20 &lt;- list(\n  n = 100,\n  p = 0.34,\n  q = NULL,\n  np = NULL,\n  nq = NULL\n)\n\n\n\nQuestão A\n\ne20$q &lt;- 1 - e20$p\n\n\\[ n = 100 \\] \\[ p = 0.34 \\] \\[ q = 0.66 \\]\n\n\nQuestão B\n\ne20$np &lt;- e20$n * e20$p\ne20$nq &lt;- e20$n * e20$q\n\n\\[ np = 34 \\] \\[ nq = 66 \\]\n\n\nQuestão C\nPodemos usar uma distribuição normal para aproximar, pois \\(np \\ge 5 \\land nq \\ge 5\\).\n\n\nQuestão D\n\nmu_b &lt;- e20$np\nsigma_b &lt;- sqrt(e20$n * e20$p * e20$q)\n\n\\[ \\mu = 34 \\] \\[ \\sigma = 4.7371 \\]"
+  },
+  {
+    "objectID": "L2.html#exercício-21",
+    "href": "L2.html#exercício-21",
+    "title": "Trabalho Final",
+    "section": "Exercício 21",
+    "text": "Exercício 21\n\n\nCódigo\ne21 &lt;- list(\n  n = 100,\n  p = 0.34,\n  q = NULL,\n  np = NULL,\n  nq = NULL,\n  mu = NULL,\n  sigma = NULL,\n  z = NULL,\n  ps = NULL,\n  a = NULL\n)\n\n\n\ne21$q &lt;- 1 - e21$p\ne21$np &lt;- e21$n * e21$p\ne21$nq &lt;- e21$n * e21$q\n\n\\[ n = 100 \\] \\[ p = 0.34 \\] \\[ q = 0.66 \\] \\[ np = 34 \\] \\[ nq = 66 \\]\n\nQuestão A\nNovamente podemos usar uma distribuição normal, dado que \\(np \\ge 5 \\land nq \\ge 5\\).\n\n\nQuestão B\n\ne21$mu &lt;- e21$np\ne21$sigma &lt;- sqrt(e21$n * e21$p * e21$q)\n\n\\[ \\mu = 34 \\] \\[ \\sigma = 4.7371 \\]\n\n\nQuestão C\nPara corrigir \\(P(x &gt; 30)\\), usaremos \\(x \\ge 30.5\\).\n\ne21$a &lt;- 30.5\n\n\n\nQuestão D\n\ne21$z &lt;- (e21$a - e21$mu) / e21$sigma\ne21$ps &lt;- pnorm(e21$z, lower.tail = FALSE)\n\n\\[ z = -0.7388506 \\] \\[ P(X &gt; 30) \\approx P(Z &gt; z) = 0.77 \\]\n\nz_plot(e21$z)\n\n\n\n\n\n\n\n\n\n\nCódigo\nx_vector &lt;- seq(e21$mu - 4*e21$sigma, e21$mu + 4*e21$sigma, length.out = 400)\npairs &lt;- tibble(x = x_vector, y = dnorm(\n  x_vector,\n  mean = e21$mu,\n  sd = e21$sigma\n)\n)\n\nggplot(pairs, aes(x, y)) +\n  geom_line(color = \"darkgreen\") +\n  geom_area(data = subset(pairs, x &gt;= e21$a),\n    aes(x, y),\n    fill = \"darkgreen\", alpha = 0.4) +\n  geom_vline(xintercept = e21$a, linetype = \"dashed\") +\n   labs(\n    title = paste(\n      \"Aproximação Normal para Binomial, n =\", e21$n, \"p =\", e21$p\n    ),\n    subtitle = \"Em destaque, P(X &gt; 30) com correção de continuidade\",\n    x = \"X\",\n    y = \"Densidade de probabilidade\"\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )"
+  },
+  {
+    "objectID": "L2.html#exercício-22",
+    "href": "L2.html#exercício-22",
+    "title": "Trabalho Final",
+    "section": "Exercício 22",
+    "text": "Exercício 22\n\n\nCódigo\ne22 &lt;- list(\n  n = 100,\n  p = 0.58,\n  q = NULL,\n  k = 100,\n  np = NULL,\n  nq = NULL,\n  mu = NULL,\n  sigma = NULL,\n  z = NULL,\n  ps = NULL,\n  a = NULL\n)\n\n\n\ne22$q &lt;- 1 - e22$p\ne22$np &lt;- e22$n * e22$p\ne22$nq &lt;- e22$n * e22$q\n\n\\[ n = 100 \\] \\[ p = 0.58 \\] \\[ q = 0.42 \\] \\[ np = 58 \\] \\[ nq = 42 \\]\n\nQuestão A\nMais uma vez podemos usar uma distribuição normal, dado que \\(np \\ge 5 \\land nq \\ge 5\\).\n\n\nQuestão B\n\ne22$mu &lt;- e22$np\ne22$sigma &lt;- sqrt(e22$n * e22$p * e22$q)\n\n\\[ \\mu = 58 \\] \\[ \\sigma = 4.9356 \\]"
+  },
+  {
+    "objectID": "L2.html#exercício-23",
+    "href": "L2.html#exercício-23",
+    "title": "Trabalho Final",
+    "section": "Exercício 23",
+    "text": "Exercício 23\n\n\nCódigo\ne23 &lt;- list(\n  n = 75,\n  p = 0.32,\n  q = NULL,\n  x = 15,\n  np = NULL,\n  nq = NULL,\n  mu = NULL,\n  sigma = NULL,\n  xs = NULL,\n  xs = NULL,\n  zs = NULL,\n  zi = NULL,\n  prob = NULL\n)\n\n\n\ne23$q &lt;- 1 - e23$p\ne23$np &lt;- e23$n * e23$p\ne23$nq &lt;- e23$n * e23$q\n\n\\[ n = 75 \\] \\[ p = 0.32 \\] \\[ q = 0.68 \\] \\[ np = 24 \\] \\[ nq = 51 \\]\n\nQuestão A\nAinda podemos usar uma distribuição normal, dado que \\(np \\ge 5 \\land nq \\ge 5\\).\n\n\nQuestão B\n\ne23$mu &lt;- e23$np\ne23$sigma &lt;- sqrt(e23$n * e23$p * e23$q)\n\n\\[ \\mu = 24 \\] \\[ \\sigma = 4.0398 \\]\n\n\nQuestão C\n\ne23$xi &lt;- e23$x - 0.5\ne23$xs &lt;- e23$x + 0.5\n\ne23$zi &lt;- (e23$xi - e23$mu) / e23$sigma\ne23$zs &lt;- (e23$xs - e23$mu) / e23$sigma\n\n\\[ x_i = 14.5 \\] \\[ x_s = 15.5 \\] \\[ z_i = -2.3516004 \\] \\[ z_s = -2.1040635 \\]\n\n\nQuestão D\nPara aproximar \\(P(X = 15)\\) para a distribuição normal:\npnorm(e23$zs) - pnorm(e23$zi) |&gt; ppercent()\n\\[P = 0.009346 \\approx 0.93\\%\\]numeric(0)\n\nz_plot(e23$zs, opposite = e23$zi)"
+  },
+  {
+    "objectID": "L2.html#exercício-24",
+    "href": "L2.html#exercício-24",
+    "title": "Trabalho Final",
+    "section": "Exercício 24",
+    "text": "Exercício 24\nO problema apresentado neste exercíciio é mais simples por poder ser reduzido a um vetor tal que:\n\nhours &lt;- c(\n  26, 25, 32, 31, 28, 28,\n  28, 22, 28, 25, 21, 40,\n  32, 22, 25, 22, 26, 24,\n  46, 20, 35, 22, 32, 48,\n  32, 36, 38, 32, 22, 19\n)\n\n\nQuestões A e B\nCom isso, podemos obter a média amostral, que corresponde também à média populacional:\n\nx_bar &lt;- mean(hours)\nx_bar\n\n[1] 28.9"
+  },
+  {
+    "objectID": "L2.html#exercício-25",
+    "href": "L2.html#exercício-25",
+    "title": "Trabalho Final",
+    "section": "Exercício 25",
+    "text": "Exercício 25\n\nQuestão A\nUsando o mesmo vetor, teremos:\n\nn     &lt;- length(hours)      # tamanho da amostra\nsigma &lt;- 7.9                # desvio populacional\nalpha &lt;- 0.05               # 95% de confiança\nz_c   &lt;- qnorm(1 - alpha/2) # z-crítico\n\n\n\nQuestão B\nPodemos obter a margem de erro por \\(z_c \\cdot \\sigma / \\sqrt{n}\\):\n\nE = z_c * sigma / sqrt(n)\n\n\n\nQuestão C\n\\[ n = 30 \\] \\[ \\sigma = 7.9 \\] \\[ \\alpha = 0.05 \\] \\[ z_c = 1.959964 \\] \\[ E = 2.8269267 \\]\nInterpretação: Com 95% de confiança, a média de horas semanais está no intervalo \\((26.31; 31.95)\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-26",
+    "href": "L2.html#exercício-26",
+    "title": "Trabalho Final",
+    "section": "Exercício 26",
+    "text": "Exercício 26\n\nn &lt;- length(hours)\ns &lt;- sd(hours)\nalpha &lt;- 0.05\nf &lt;- n - 1 # degrees of freedom\nt_c &lt;- qt(1 - alpha/2, f)\n\n\nQuestão A\n\nx_bar &lt;- mean(hours)\nE &lt;- t_c * s / sqrt(n)\n\n\\[ \\overline{x} = 28.9 \\] \\[ E = 2.7480781 \\]\n\n\nQuestão B\n\nli &lt;- x_bar - E\nls &lt;- x_bar + E\n\n\\[ l_i = 26.1519219 \\] \\[ l_s = 31.6480781 \\]\n\n\nQuestão C\nInterpretação: Com 95% de confiança, a média populacional de horas semanais está no intervalo \\((26.15; 31.65)\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-27",
+    "href": "L2.html#exercício-27",
+    "title": "Trabalho Final",
+    "section": "Exercício 27",
+    "text": "Exercício 27\nNovamente, podemos usar apenas um vetor para os dados:\n\nhours &lt;- c(\n  30, 26, 33, 26, 26, 33, 31, 31, 21, 37,\n  27, 20, 34, 35, 30, 24, 38, 34, 39, 31,\n  22, 30, 23, 23, 31, 44, 31, 33, 33, 26,\n  27, 28, 25, 35, 23, 32, 29, 31, 25, 27\n)\n\nsigma &lt;- 7.9\nE &lt;- 2\nalpha &lt;- 0.05\nz_c &lt;- qnorm(1 - alpha / 2)\n\n\\[ \\sigma = 7.9 \\] \\[ E = 2 \\] \\[ \\alpha = 0.05 \\] \\[ z_c = 1.959964 \\]\nDadas estas informações, podemos obter:\n\\[\n  n = (z_c \\cdot sigma / E)^2\n\\]\n\nn &lt;- ceiling((z_c * sigma / E)^2)\nn\n\n[1] 60\n\n\nInterpretação: Pelo menos 60 funcionários devem ser incluídos na amostra para ter 95% de confiança de que a diferença máxima entre a média amostral e a média populacional seja de 2 horas."
+  },
+  {
+    "objectID": "L2.html#exercício-28",
+    "href": "L2.html#exercício-28",
+    "title": "Trabalho Final",
+    "section": "Exercício 28",
+    "text": "Exercício 28\n\nQuestão A\nDada uma amostra de \\(n = 22\\), podemos obter o grau de liberdade \\(f = n - 1\\):\n\nn &lt;- 22\nf &lt;- n - 1\n\n\n\nQuestão B\n\nc &lt;- 0.90\n\n\n\nQuestão C\nNovamente, usamos a função qt para obter o valor \\(t_c\\).\n\nalpha &lt;- 1 - c\nt_c &lt;- qt(1 - alpha / 2, f)\n\n\n\nQuestão D\nO valor crítico \\(t_c\\) para um nível de confiança de 90% com uma amostra de 22 é 1.7207429."
+  },
+  {
+    "objectID": "L2.html#exercício-29",
+    "href": "L2.html#exercício-29",
+    "title": "Trabalho Final",
+    "section": "Exercício 29",
+    "text": "Exercício 29\nPodemos definir as seguintes variáveis a partir do enunciado:\n\nn &lt;- 16\nmu &lt;- 162\ns &lt;- 10\nf &lt;- n - 1\nse &lt;- s / sqrt(n)\n\nCom elas, podemos então construir duas listas, cada uma contendo os limites superiores e inferiores para os intervalos de confiança de 90% e 99%:\n\n## 90%\nalpha90 &lt;- 0.10\nt90 &lt;- qt(1 - alpha90 / 2, f)\ne90 &lt;- t90 * se\nci90 &lt;- list(i = x_bar - e90, s = x_bar + e90)\n\n## 99%\nalpha99 &lt;- 0.01\nt99 &lt;- qt(1 - alpha99 / 2, f)\ne99 &lt;- t99 * se\nci99 &lt;- list(i = x_bar - e99, s = x_bar + e99)\n\nOs valores obtidos mostram:\n\nIntervalo de confiança de 90%\n\nLimite inferior 24.5174\nLimite superior 33.2826\n\nIntervalo de confiança de 99%\n\nLimite inferior 21.5332\nLimite superior 36.2668"
+  },
+  {
+    "objectID": "L2.html#exercício-30",
+    "href": "L2.html#exercício-30",
+    "title": "Trabalho Final",
+    "section": "Exercício 30",
+    "text": "Exercício 30\nNovamente, podemos definir as seguintes variáveis a partir do enunciado:\n\nn     &lt;- 36\nmu &lt;- 9.75\ns     &lt;- 2.39\nf    &lt;- n - 1\nse    &lt;- s / sqrt(n)\n\n\n## 90%\nt90  &lt;- qt(0.95, f)\ne90  &lt;- t90 * se\nci90 &lt;- list(i = mu - e90, s = x_bar + e90)\n\n## 95%\nt95  &lt;- qt(0.975, f)\ne95  &lt;- t95 * se\nci95 &lt;- list(i = mu - e95, s = x_bar + e95)\n\nTemos, portanto, os intervalos de confiança:\n\nci90\n\n$i\n[1] 9.076987\n\n$s\n[1] 29.57301\n\nci95\n\n$i\n[1] 8.94134\n\n$s\n[1] 29.70866\n\n\n\nQuestão A\n\nIntervalo de confiança de 90%\n\n\\(t_c = 1.6896\\)\n\\(E = 0.673\\)\n\nIntervalo de confiança de 95%\n\n\\(t_c = 2.0301\\)\n\\(E = 0.8087\\)\n\n\n\n\nQuestão B\n\nIntervalo de confiança de 90%\n\nLimite inferior 9.077\nLimite superior 29.573\n\nIntervalo de confiança de 95%\n\nLimite inferior 8.9413\nLimite superior 29.7087\n\n\n\n\nQuestão C\nPodemos comparar as larguras usando uma subtração simples:\n\nIntervalo de confiança de 90%\n\nLargura: 20.496\n\nIntervalo de confiança de 95%\n\nLargura: 20.7673"
+  },
+  {
+    "objectID": "L2.html#exercício-31",
+    "href": "L2.html#exercício-31",
+    "title": "Trabalho Final",
+    "section": "Exercício 31",
+    "text": "Exercício 31\nComo o desvio padrão da população é desconhecido e temos uma amostra pequena, devemos usar a distribuição \\(t\\) com um índice de liberdade de \\(n - 1\\).\nMais uma vez, vamos primeiro designar algumas variáveis com os valores do enunciado:\n\nn &lt;- 18\nx_bar &lt;- 64\ns &lt;- 2.5\nf &lt;- n - 1\n\nDado o intervalo de confiança de \\(90\\%\\), temos \\(\\alpha = 0.1\\):\n\nalpha &lt;- 0.10\nt_c &lt;- qt(1 - alpha / 2, f)\nse &lt;- s / sqrt(n)\n\nE com isso podemos obter a margem de erro:\n\nme &lt;- t_c * se\n\nNosso intervalo de confiança estará, portanto, entre:\n\nc_i &lt;- x_bar - me\nc_s &lt;- x_bar + me\n\nOu seja, entre 62.9749 e 65.0251."
+  },
+  {
+    "objectID": "L2.html#exercício-32",
+    "href": "L2.html#exercício-32",
+    "title": "Trabalho Final",
+    "section": "Exercício 32",
+    "text": "Exercício 32\n\nQuestão A\nPelo enunciado, temos:\n\nx &lt;- 123\nn &lt;- 2462\n\n\n\nQuestão B\nPodemos obter \\(\\hat{p}\\) com uma proporção simples de \\(x \\over n\\).\n\np_h &lt;- x / n\n\n\\[ \\hat{p} = 0.0499594\\]"
+  },
+  {
+    "objectID": "L2.html#exercício-33",
+    "href": "L2.html#exercício-33",
+    "title": "Trabalho Final",
+    "section": "Exercício 33",
+    "text": "Exercício 33\n\nUse os dados do exercício 32 para construir um intervalo de confiança de 90% para a proporção populacional de professores americanos que disseram que “todas ou quase todas” as informações que eles encontram utilizando ferramentas de busca on-line são corretas ou confiáveis.\n\n\nQuestão A\n\nx     &lt;- 123\nn     &lt;- 2462\np_h &lt;- x / n\nq_h &lt;- 1 - p_h\n\n\\[ \\hat{p} = 0.0499594 \\] \\[ \\hat{q} = 0.9500406 \\]\n\n\nQuestão B\n\nnp  &lt;- n * p_h\nnq  &lt;- n * q_h\n\nA distribuição amostral pode ser aproximada por uma distribuição normal pois $ np = 123 nq = 2339 $.\n\n\nQuestão C\n\nz_c &lt;- qnorm(0.95)\ne &lt;- z_c * sqrt(p_h * q_h / n)\n\n\\[ z_c = 1.6448536 \\] \\[ E = 0.0072221 \\]\n\n\nQuestão D\n\nl_i &lt;- p_h - e\nl_s &lt;- p_h + e\n\n\n\nQuestão E\nO intervalo de confiança populacional é aproximadamente (0.0435; 0.0565).\nCom 90% de confiança, entre 4.35% e 5.65% dos professores dos Estados Unidos responderiam “todas ou quase todas”."
+  },
+  {
+    "objectID": "L2.html#exercício-34",
+    "href": "L2.html#exercício-34",
+    "title": "Trabalho Final",
+    "section": "Exercício 34",
+    "text": "Exercício 34\n\nQuestão A\n\nn &lt;- 498\np_h &lt;- 0.25\nq_h &lt;- 1 - p_h\np_h\n\n[1] 0.25\n\nq_h\n\n[1] 0.75\n\n\n\\[ \\hat{p} = 0.25 \\] \\[ \\hat{q} = 0.75 \\]\n\n\nQuestão B\n\nnp  &lt;- n * p_h\nnq  &lt;- n * q_h\n\nA amostra pode ser aproximada pela distribuição normal dado que $ np = 124.5 nq = 373.5 $.\n\n\nQuestão C\n\nz_c &lt;- qnorm(0.995)\ne &lt;- z_c * sqrt(p_h * q_h / n)\n\n\\[ z_c = 2.5758293 \\] \\[ E = 0.0499808 \\]\n\n\nQuestão D\n\nl_i &lt;- p_h - e\nl_s &lt;- p_h + e\n\n\\[ l_i = 0.2000192 \\] \\[ l_s = 0.2999808 \\]\n\n\nQuestão E\nCom 99% de confiança, a proporção de adultos americanos que consideram pessoas acima de 65 anos os motoristas mais perigosos está entre aproximadamente 20% e 30%."
+  },
+  {
+    "objectID": "L2.html#exercício-35",
+    "href": "L2.html#exercício-35",
+    "title": "Trabalho Final",
+    "section": "Exercício 35",
+    "text": "Exercício 35\n\nQuestão A\n\np_h1 &lt;- 0.5\nq_h1 &lt;- 1 - p_h1\n\np_h2 &lt;- 0.31\nq_h2 &lt;- 1 - p_h2\n\nz_c &lt;- qnorm(0.95)\ne &lt;- 0.02\n\n\n\nQuestão B\nA partir de,\n\\[ n = ({z_c}^2 \\cdot \\hat{p} \\cdot \\hat{q}) \\over E^2 \\]\nTemos:\n\nn1 &lt;- (z_c^2 * p_h1 * q_h1) / e^2\n\nn2 &lt;- (z_c^2 * p_h2 * q_h2) / e^2\n\n\\[ n_1 = 1690.9646588 \\] \\[ n_2 = 1446.7893621 \\]\n\n\nQuestão C\nDado o domínio da aplicação, precisamos dos valores arredondados:\n\nn1 &lt;- ceiling(n1)\nn2 &lt;- ceiling(n2)\n\nSem estimativa prévia, precisa-se de 1691 pessoas Com \\(\\hat{p} = 0.31\\), precisa-se de 1447 pessoas"
+  },
+  {
+    "objectID": "L2.html#exercício-36",
+    "href": "L2.html#exercício-36",
+    "title": "Trabalho Final",
+    "section": "Exercício 36",
+    "text": "Exercício 36\n\nEncontre os valores críticos χ2R e χ2L para um intervalo de confiança de 90% quando o tamanho da amostra é 30.\n\n\nQuestão A\n\nn &lt;- 30\nf &lt;- n - 1\nconf &lt;- 0.90\nalpha &lt;- 1 - conf\nf\n\n[1] 29\n\nalpha\n\n[1] 0.1\n\n\n\n\nQuestão B\nAs áreas são \\(0.05\\) à direita e \\(0.05\\) à esquerda.\n\n\nQuestão C\nPodemos usar a distribuição chi quadrado. Na linguagem R, a função qchisq oferece o que precisamos:\n\nc_r &lt;- qchisq(1 - alpha / 2, f)\nc_l &lt;- qchisq(alpha / 2,     f)\n\n\\[ c_r = 42.5569678 \\] \\[ c_l = 17.7083662 \\]\n\n\nQuestão D\nCom 90% de confiança, χ^2 está entre aproximadamente 17.71 e aproximadamente 42.56."
+  },
+  {
+    "objectID": "L2.html#exercício-37",
+    "href": "L2.html#exercício-37",
+    "title": "Trabalho Final",
+    "section": "Exercício 37",
+    "text": "Exercício 37\n\nQuestão A\n\nn &lt;- 30\nf &lt;- n - 1\ns &lt;- 1.20\n\nconf1 &lt;- 0.90; alpha1 &lt;- 1 - conf1\nconf2 &lt;- 0.95; alpha2 &lt;- 1 - conf2\n\nc_r1 &lt;- qchisq(1 - alpha1 / 2, f)\nc_l1 &lt;- qchisq(alpha1 / 2, f)\n\nc_r2 &lt;- qchisq(1 - alpha2 / 2, f)\nc_l2 &lt;- qchisq(alpha2 / 2, f)\n\n\n\nQuestão B\n\nvar_est &lt;- (f * s^2)\n\n# 90%\nv1_i &lt;- var_est / c_r1\nv1_s &lt;- var_est / c_l1\n\n# 95%\nv2_i &lt;- var_est / c_r2\nv2_s &lt;- var_est / c_l2\n\n\n\nQuestão C\n\nsd1_i &lt;- sqrt(v1_i)\nsd1_s &lt;- sqrt(v1_s)\n\nsd2_i &lt;- sqrt(v2_i)\nsd2_s &lt;- sqrt(v2_s)\n\n\n\nQuestão D\n\nIntervalo de confiança de 90%\n\nPara a variância: 0.98 a 2.36\nPara o desvio padrão: 0.99 a 1.54\n\nIntervalo de confiança de 95%\n\nPara a variância: 0.91 a 2.6\nPara o desvio padrão: 0.96 a 1.61"
+  },
+  {
+    "objectID": "L2.html#exercício-38",
+    "href": "L2.html#exercício-38",
+    "title": "Trabalho Final",
+    "section": "Exercício 38",
+    "text": "Exercício 38\n\nQuestão A\n\n\\(\\mu \\ne 74\\)\n\\(\\sigma^2 \\le 2.7\\)\n\\(p \\gt 0.24\\)\n\n\n\nQuestão B\n\n\\(\\mu = 74\\)\n\\(\\sigma^2 \\gt 2.7\\)\n\\(p \\ge 0.24\\)\n\n\n\nQuestão C\n\n\\(H_0\\) e \\(H_a\\) para média\n\n\n\\(H_0: \\mu = 74\\)\n\\(H_a: \\mu \\ne 74\\) (afirmação)\n\n\n\\(H_0\\) e \\(H_a\\) para variância\n\n\n\\(H_0: \\sigma^2 \\le 2.7\\) (afirmação)\n\\(H_a: \\sigma^2 \\gt 2.7\\)\n\n\n\\(H_0\\) e \\(H_a\\) para proporção\n\n\n\\(H_0: p \\le 0.24\\)\n\\(H_a: p \\gt 0.24\\) (afirmação)"
+  },
+  {
+    "objectID": "L2.html#exercício-39",
+    "href": "L2.html#exercício-39",
+    "title": "Trabalho Final",
+    "section": "Exercício 39",
+    "text": "Exercício 39\n\nQuestão A\n\n\\(H_0: p \\le 0.01\\)\n\\(H_a: p \\gt  0.01\\)\n\n\n\nQuestão B\n\nErro tipo I: rejeitar \\(H_0\\) quando \\(p \\le 0.01\\), concluindo que a taxa é \\(\\gt 1\\%\\) quando na realidade é \\(\\le 1\\%\\)\nErro tipo II: não rejeitar \\(H_0\\) quando \\(p \\gt 0.01\\), concluindo que a taxa é \\(\\le 1\\%\\) quando na realidade é \\(\\gt 1\\%\\)\n\n\n\nQuestão C\nO erro tipo II é mais sério."
+  },
+  {
+    "objectID": "L2.html#exercício-40",
+    "href": "L2.html#exercício-40",
+    "title": "Trabalho Final",
+    "section": "Exercício 40",
+    "text": "Exercício 40\n\nQuestão A\n\nAnalista de consumo\n\n\n\\(H_{0}\\colon \\mu = 74\\)\n\\(H_{a}\\colon \\mu \\neq 74\\)\n\n\nCorretor de imóveis\n\n\n\\(H_{0}\\colon p = 0.24\\)\n\\(H_{a}\\colon p &gt; 0.24\\)\n\n\n\nQuestão B\n\nTeste bilateral: \\(\\mu \\ne 74\\)\n\n\nz0 &lt;- 2.1\np_b &lt;- 2 * (1 - pnorm(abs(z0)))\np_b\n\n[1] 0.03572884\n\n\n\nTeste unilateral à direita: \\(p \\gt 0.24\\)\n\n\nz0 &lt;- 1.5\np_u &lt;- 1 - pnorm(z0)\np_u\n\n[1] 0.0668072\n\n\n\n\nQuestão C\n\nz_plot(qnorm(1 - p_u), right = TRUE)\n\n\n\n\n\n\n\n\n\n\nCódigo\nz_crit &lt;- qnorm(1 - p_b / 2)\npairs &lt;- tibble(x = seq(-4, 4, length.out = 1000))\npairs$y &lt;- dnorm(pairs$x)\n\nggplot(pairs, aes(x, y)) +\n  geom_line() +\n  geom_area(\n    data = subset(pairs, x &lt;= -z_crit), aes(x, y),\n    fill = \"darkgreen\",\n    alpha = 0.5\n  ) +\n  geom_area(\n    data = subset(pairs, x &gt;=  z_crit), aes(x, y),\n    fill = \"darkgreen\",\n    alpha = 0.5\n  ) +\n  geom_vline(xintercept = c(-z_crit, z_crit), linetype = \"dashed\") +\n  labs(\n    title = \"Teste Bilateral\",\n    x = \"z\",\n    y = \"Densidade de probabilidade\"\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )"
+  },
+  {
+    "objectID": "L2.html#exercício-41",
+    "href": "L2.html#exercício-41",
+    "title": "Trabalho Final",
+    "section": "Exercício 41",
+    "text": "Exercício 41\n\nInterpretação: rejeitar \\(H_0\\)\n\nProporção de estudantes: 61%\n\nHá evidência suficiente para afirmar que a proporção de estudantes em atividades extracurriculares não é 0.61\n\\(\\text{Rejeitar } H_0 \\colon p = 0.61 \\Longrightarrow p \\neq 0.61\\)\n\nTempo médio de troca de óleo é menor que 15 min\n\nHá evidência suficiente para concluir que o tempo médio é menor que 15 minutos\n\\(\\text{Rejeitar } H_0 \\colon \\mu = 15 \\Longrightarrow \\mu \\lt 15\\)\n\n\n\n\nInterpretação: não rejeitar \\(H_0\\)\n\nProporção de estudantes é 61%\n\nNão há evidência suficiente para afirmar que a proporção difere de 0.61\n\nTempo médio de troca de óleo é menor que 15 min\n\nNão há evidência suficiente para afirmar que o tempo médio é menor que 15 minutos"
+  },
+  {
+    "objectID": "L2.html#exercício-42",
+    "href": "L2.html#exercício-42",
+    "title": "Trabalho Final",
+    "section": "Exercício 42",
+    "text": "Exercício 42\n\nVocê realiza um teste de hipótese para cada uma das afirmações. Como você deveria interpretar sua decisão se rejeitar H0? E se você não rejeitar H0? Ha (afirmação): Um corretor de imóveis divulga que a proporção de proprietários que acham suas casas muito pequenas para suas famílias é mais que 24%.\n\n\nQuestão A\nSe rejeitarmos \\(H_0\\), a interpretação seria de que há evidência suficiente para concluir que a proporção de proprietários que acham suas casas muito pequenas é maior que 24%.\n\n\nQuestão B\nSe não rejeitarmos \\(H_0\\), a interpretação seria de que não há evidência suficiente para concluir que a proporção de proprietários que acham suas casas muito pequenas é maior que 24%."
+  },
+  {
+    "objectID": "L2.html#exercício-43",
+    "href": "L2.html#exercício-43",
+    "title": "Trabalho Final",
+    "section": "Exercício 43",
+    "text": "Exercício 43\n\nEncontre o valor p para um teste de hipótese unilateral à esquerda com uma estatística de teste padronizada z = –1,71. Decida se rejeita H0 quando o nível de significância é α = 0,05.\n\n\nQuestão A\n\nz &lt;- -1.71\np &lt;- pnorm(z)\np\n\n[1] 0.04363294\n\n\n\n\nQuestão B\nEste valor é o mesmo obtido na questão A, \\(0.0436329\\).\n\n\nQuestão C\nInterpretação: Uma vez que \\(p = 0.0436329 &lt; \\alpha = 0.1\\) , devemos rejeitar \\(H_0\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-44",
+    "href": "L2.html#exercício-44",
+    "title": "Trabalho Final",
+    "section": "Exercício 44",
+    "text": "Exercício 44\n\nQuestão A\n\nz &lt;- 1.64\np &lt;- pnorm(z)\np\n\n[1] 0.9494974\n\n\n\n\nQuestão B\n\np_2 &lt;- 2 * (1 - pnorm(z))\np_2\n\n[1] 0.1010052\n\n\n\n\nQuestão C\n\\[\n  p = 0.9494974 &gt; \\alpha = 0.10 \\Longrightarrow \\text{Não rejeitar } H_{0}.\n\\]"
+  },
+  {
+    "objectID": "L2.html#exercício-45",
+    "href": "L2.html#exercício-45",
+    "title": "Trabalho Final",
+    "section": "Exercício 45",
+    "text": "Exercício 45\n\nQuestão A\n\n\\(H_{0}\\colon \\mu = 35\\)\n\\(H_{a}\\colon \\mu &gt; 35\\)\n\n\n\nQuestão B\n\n\\(\\alpha = 0.05\\)\n\n\n\nQuestão C\n\nx_bar &lt;- 36\nmu &lt;- 35\nsigma &lt;- 4\nn &lt;- 100\n\nz &lt;- (x_bar - mu) / (sigma / sqrt(n))\nz\n\n[1] 2.5\n\n\n\n\nQuestão D\n\np &lt;- 1 - pnorm(z)\np\n\n[1] 0.006209665\n\n\n\n\nQuestão E\nDado que \\(p = 0.0062097 &lt; \\alpha = 0.05\\), devemos rejeitar \\(H_0\\).\n\n\nQuestão F\nInterpretação: Há evidência suficiente para concluir que a velocidade média dos veículos ultrapassa 35 milhas por hora."
+  },
+  {
+    "objectID": "L2.html#exercício-46",
+    "href": "L2.html#exercício-46",
+    "title": "Trabalho Final",
+    "section": "Exercício 46",
+    "text": "Exercício 46\n\nQuestão A\n\nAfirmação: “o tempo médio para recuperar o custo é 3 anos”.\n\\(H_0: \\mu = 3\\)\n\\(H_1: \\mu \\neq 3\\)\n\n\n\nQuestão B\n\nalpha &lt;- 0.01\n\n\n\nQuestão C\n\nx_bar &lt;- 3.3\nmu  &lt;- 3\nsigma &lt;- 0.5\nn &lt;- 25\n\nz &lt;- (x_bar - mu) / (sigma / sqrt(n))\nz\n\n[1] 3\n\n\n\n\nQuestão D\n\np &lt;- 2 * (1 - pnorm(abs(z)))\np\n\n[1] 0.002699796\n\n\n\n\nQuestão E\nComo \\(p \\approx 0.0027 &lt; \\alpha = 0.01\\), devemos rejeitar \\(H_0\\).\n\n\nQuestão F\nInterpretação: Há evidências suficientes de que o tempo médio para recuperar o custo difere de 3 anos. No caso da presente estatística, ele parece ser maior."
+  },
+  {
+    "objectID": "L2.html#exercício-47",
+    "href": "L2.html#exercício-47",
+    "title": "Trabalho Final",
+    "section": "Exercício 47",
+    "text": "Exercício 47\n\nQuestão A\n\nalpha &lt;- 0.10\n\n\nz_plot(qnorm(alpha))\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\nz &lt;- -1.28\na &lt;- pnorm(z)\na\n\n[1] 0.1002726\n\n\n\n\nQuestão C\n\nz_a &lt;- qnorm(a)\nz_a\n\n[1] -1.28\n\n\n\nz_plot(z_a)\n\n\n\n\n\n\n\n\n\n\nQuestão D\nA zona de rejeição está à esquerda de \\(z = -1.28\\), ou seja, devemos rejeitar se \\(z \\lt -1.28\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-48",
+    "href": "L2.html#exercício-48",
+    "title": "Trabalho Final",
+    "section": "Exercício 48",
+    "text": "Exercício 48\n\nQuestão A\n\n\nCódigo\nalpha &lt;- 0.08\nz_i &lt;- qnorm(alpha / 2)\nz_s &lt;- qnorm(1 - alpha / 2)\n\ndf &lt;- tibble(x = seq(-4, 4, length.out = 400))\ndf$y &lt;- dnorm(df$x)\n\nggplot(df, aes(x = x, y = y)) +\n  geom_line(linewidth = 1) +\n  geom_ribbon(data = subset(df, x &lt;= z_i),\n              aes(ymin = 0, ymax = y),\n              fill = \"darkgreen\", alpha = 0.5) +\n  geom_ribbon(data = subset(df, x &gt;= z_s),\n              aes(ymin = 0, ymax = y),\n              fill = \"darkgreen\", alpha = 0.5) +\n  geom_vline(xintercept = c(z_i, z_s),\n             linetype = \"dashed\", color = \"darkgreen\") +\n  annotate(\"text\", x = z_i, y = max(df$y) * 0.6,\n           label = paste0(\"z_i = \", round(z_i, 3)),\n           hjust = 1.1, color = \"darkgreen\") +\n  annotate(\"text\", x = z_s, y = max(df$y) * 0.6,\n           label = paste0(\"z_s = \", round(z_s, 3)),\n           hjust = -0.1, color = \"darkgreen\") +\n  labs(\n    title = \"Curva Normal Padrão: α/2 em cada cauda\",\n    x = \"z\",\n    y = \"f(z)\"\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )\n\n\n\n\n\n\n\n\n\n\n\nQuestão B\n\nalpha &lt;- 0.08\na_i &lt;- pnorm(qnorm(alpha/2))\na_s &lt;- pnorm(qnorm(1 - alpha/2))\n\n\\[ a_i = 0.04 \\] \\[ a_s = 0.96 \\]\n\n\nQuestão C\n\nz_i &lt;- qnorm(0.04)\nz_s &lt;- qnorm(0.96)\nz_i  # -1.750686\n\n[1] -1.750686\n\nz_s  #  1.750686\n\n[1] 1.750686\n\n\n\n\nQuestão D\nRejeitar \\(H_0\\) se \\(z \\lt -1.7506861\\) ou \\(z \\gt 1.7506861\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-49",
+    "href": "L2.html#exercício-49",
+    "title": "Trabalho Final",
+    "section": "Exercício 49",
+    "text": "Exercício 49\n\nHipóteses\n\n\\(H_0: \\mu = 68000\\)\n\\(H_1: \\mu \\lt 68000\\)\n\n\n\nx_bar  &lt;- 66900\nmu &lt;- 68000\nsigma &lt;- 5500\nn &lt;- 20\n\nz &lt;- (x_bar - mu) / (sigma / sqrt(n))\np &lt;- pnorm(z)\n\n\\[ z = -0.8944272 \\] \\[ p = 0.1855467 \\]\n\\(0.1855467 \\gt \\alpha = 0.05\\), logo, não devemos rejeitar \\(H_0\\).\nInterpretação: Não há evidência suficiente de que o salário médio seja menor que \\(68 000\\)."
+  },
+  {
+    "objectID": "L2.html#exercício-50",
+    "href": "L2.html#exercício-50",
+    "title": "Trabalho Final",
+    "section": "Exercício 50",
+    "text": "Exercício 50\n\nQuestão A\n\nalpha1 &lt;- 0.1\nalpha2 &lt;- 0.01\n\n\n\nQuestão B\n\nz_1 &lt;- qnorm(1 - alpha1 / 2)\nz_2 &lt;- qnorm(1 - alpha2 / 2)\n\n\\[ z_1 = 1.6448536 \\] \\[ z_2 = 2.5758293 \\]\nAs regiões de rejeição são \\(z \\lt -z_0\\) ou \\(z &gt; z_0\\).\n\n\nQuestão C\n\n\nCódigo\nlibrary(ggplot2)\nalpha &lt;- 0.10\nz0 &lt;- qnorm(1 - alpha / 2)\nx &lt;- seq(-4, 4, length = 400)\ny &lt;- dnorm(x)\nggplot(data.frame(x, y), aes(x, y)) +\n  geom_line() +\n  geom_ribbon(data = subset(data.frame(x, y), x &lt;= -z0),\n    aes(ymin = 0, ymax = y), fill = \"darkgreen\", alpha = 0.5) +\n  geom_ribbon(data = subset(data.frame(x, y), x &gt;=  z0),\n    aes(ymin = 0, ymax = y), fill = \"darkgreen\", alpha = 0.5) +\n  geom_vline(\n    xintercept = c(-z0, z0),\n    linetype = \"dashed\",\n    color = \"darkgreen\"\n  ) +\n  geom_vline(xintercept = z, colour = \"darkgreen\") +\n  labs(title = \"Teste Z bilateral\",\n    subtitle = paste(\"α = 0.1, z = \", round(z, 3))) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )\n\n\n\n\n\n\n\n\n\n\n\nQuestão D\nInterpretação: Com \\(\\alpha = 0.1\\), há evidência suficiente para rejeitar a afirmação de que o custo médio é \\(13960\\) (o custo médio parece menor). Com \\(\\alpha = 0.01\\), não há evidência suficiente para rejeitar a afirmação."
+  },
+  {
+    "objectID": "L2.html#exercício-51",
+    "href": "L2.html#exercício-51",
+    "title": "Trabalho Final",
+    "section": "Exercício 51",
+    "text": "Exercício 51\n\nQuestão A\n\\[gl = n - 1 = 9 - 1 = 8\\]\n\n\nQuestão B\n\nalpha &lt;- 0.10\nf    &lt;- 8\n\nt0 &lt;- qt(1 - alpha, f)\n\n\\[ t_0 = 1.3968153 \\]"
+  },
+  {
+    "objectID": "L2.html#exercício-52",
+    "href": "L2.html#exercício-52",
+    "title": "Trabalho Final",
+    "section": "Exercício 52",
+    "text": "Exercício 52\n\nEncontre os valores críticos –t0 e t0 para um teste bilateral para α = 0,05 e n = 16.\n\n\nQuestão A\n\\[gl = n - 1 = 16 - 1 = 15\\]\n\n\nQuestão B\n\nalpha &lt;- 0.05\nf &lt;- 15\n\nt_i &lt;- qt(alpha / 2, f)\nt_s &lt;- qt(1 - alpha / 2, f)\n\n\\[ t_i = -2.1314495 \\] \\[ t_s = 2.1314495 \\]"
+  },
+  {
+    "objectID": "L2.html#exercício-53",
+    "href": "L2.html#exercício-53",
+    "title": "Trabalho Final",
+    "section": "Exercício 53",
+    "text": "Exercício 53\n\nQuestão A\n\\[ H_0:\\ \\mu = 1200 \\] \\[ H_a:\\ \\mu &lt; 1200 \\]\n\n\nQuestão B\n\nalpha &lt;- 0.1\nn &lt;- 7\nf &lt;- n - 1\n\n\n\nQuestão C\n\nt &lt;- qt(alpha, f)\n\n\\[ t = -1.4397557 \\]\n\n\nQuestão D\n\nx_bar &lt;- 1125\nmu &lt;- 1200\ns &lt;- 55\nn &lt;- 7\n\nt_stat &lt;- (x_bar - mu) / (s / sqrt(n))\np &lt;- pt(t_stat, f)\n\n\\[ t_{stat} = -3.6078427 \\] \\[ p = 0.00563 \\]\n\n\nCódigo\npairs &lt;- tibble(x = seq(-4, 4, length.out = 400))\npairs$y &lt;- dt(pairs$x, df = f)\n\nggplot(pairs, aes(x, y)) +\n  geom_line() +\n  geom_ribbon(data = subset(pairs, x &lt;= t0),\n    aes(ymin = 0, ymax = y),\n    fill = \"darkgreen\", alpha = 0.5) +\n  geom_vline(xintercept = c(t0, t_stat),\n    linetype = \"dashed\",\n    color = c(\"black\", \"darkgreen\")) +\n  annotate(\"text\", x = t0, y = max(pairs$y) * 0.9,\n    label = paste0(\"t0=\", round(t0, 3)),\n    hjust = 1.1, color = \"black\") +\n  annotate(\"text\", x = t_stat, y = max(pairs$y) * 0.7,\n    label = paste0(\"t=\", round(t_stat, 3)),\n    hjust = -0.1, color = \"darkgreen\") +\n  labs(title = \"Distribuição t (df=6)\",\n    subtitle = \"Área à esquerda de t0 = região de rejeição\",\n    x = \"t\", y = \"f(t)\") +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(margin = margin(l = -45, t = 10, b = 5)),\n    plot.subtitle = element_text(margin = margin(l = -45, t = 5, b = 25)),\n    axis.title.y = element_text(\n      margin = margin(t = 0, r = 15, b = 0, l = 10, unit = \"pt\")\n    ),\n    axis.title.x = element_text(\n      margin = margin(t = 15, r = 0, b = 0, l = 0, unit = \"pt\")\n    )\n  )\n\n\n\n\n\n\n\n\n\n\n\nQuestão E\n\\[ p \\approx 0.044 &lt; \\alpha = 0.1 \\Longrightarrow \\text{ Rejeita } H_0\\]\n\n\nQuestão F\nInterpretação: Há evidência de que o custo médio do seguro é menor que 1200."
+  },
+  {
+    "objectID": "L2.html#exercício-54",
+    "href": "L2.html#exercício-54",
+    "title": "Trabalho Final",
+    "section": "Exercício 54",
+    "text": "Exercício 54\n\nUma indústria afirma que o nível médio do pH da água em um rio próximo é de 6,8. Você seleciona aleatoriamente 39 amostras de água e mede o pH de cada uma. A média amostral e o desvio padrão são de 6,7 e 0,35, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando nível de significância α = 0,05?\n\nEsta mesma indústria afirma que a condutividade média do rio é de 1.890 mg/l. A condutividade de uma amostra de água é uma medida do total de sólidos dissolvidos na amostra. Você seleciona aleatoriamente 39 amostras de água e mede a condutividade de cada uma. A média e o desvio padrão amostral são de 2.350 mg/l e 900 mg/l, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando o nível de significância α = 0,01?\n\nQuestão A\n\npH\n\n\\[ H_0: \\mu_{pH} &= 6.8 \\]\n\\[ H_a: \\mu_{pH} &\\neq 6.8 \\]\n\n\n\nCondutividade\n\n\\[ H_0: \\mu_{cond} &= 1890 \\]\n\\[ H_a: \\mu_{cond} &\\neq 1890 \\]\n\n\n\n\nQuestão B\n\n\\[ \\text{pH: }&\\alpha = 0.05,\\quad df = 39 - 1 = 38 \\]\n\\[ \\text{Cond: }&\\alpha = 0.01,\\quad df = 39 - 1 = 38 \\]\n\n\n\nQuestão C\n\ndf    &lt;- 38\nt_crit05 &lt;- qt(1 - 0.05 / 2, df)\nt_crit01 &lt;- qt(1 - 0.01 / 2, df)\nt_crit05; -t_crit05\n\n[1] 2.024394\n\n\n[1] -2.024394\n\n# [1]  2.024394 -2.024394\n\nt_crit01; -t_crit01\n\n[1] 2.711558\n\n\n[1] -2.711558\n\n# [1]  2.715158 -2.715158\n\n\n\nQuestão D\n\n# pH\nxbar1 &lt;- 6.7\nmu01  &lt;- 6.8\ns1    &lt;- 0.35\nn1    &lt;- 39\ndf    &lt;- n1 - 1\n\nt1    &lt;- (xbar1 - mu01) / (s1 / sqrt(n1))\np1    &lt;- 2 * pt(-abs(t1), df)\n\n# condutividade\nxbar2 &lt;- 2350\nmu02  &lt;- 1890\ns2    &lt;- 900\nn2    &lt;- 39\n\nt2    &lt;- (xbar2 - mu02) / (s2 / sqrt(n2))\np2    &lt;- 2 * pt(-abs(t2), df)\n\nt1; p1\n\n[1] -1.784285\n\n\n[1] 0.08236385\n\n# t1 ≈ -1.786, p1 ≈ 0.081\n\nt2; p2\n\n[1] 3.191888\n\n\n[1] 0.002835512\n\n# t2 ≈ 3.190,  p2 ≈ 0.0029\n\n\n\nCódigo\npairs &lt;- data.frame(x = seq(-4, 4, length.out = 400))\npairs$y &lt;- dt(pairs$x, df = df)\n\nggplot(pairs, aes(x, y)) +\n  geom_line() +\n  geom_vline(xintercept = c(-t_crit05, t_crit05, t1),\n             linetype = \"dashed\",\n             color = c(\"red\", \"red\",\"darkgreen\")) +\n  annotate(\"text\", x = t1, y = max(pairs$y) * 0.7,\n           label = paste0(\"t1=\", round(t1, 3)),\n           color = \"blue\") +\n  labs(title = \"Teste t bilateral para pH\",\n       subtitle = paste(\"t1 =\", round(t1, 3),\n                        \" | região de rejeição |t| &gt; 2.0244\"),\n       x = \"t\", y = \"f(t)\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\n\n\nQuestão E\n\npH (\\(\\alpha = 0.05\\))\n\n\\(p_1 \\approx 0.081 &gt; 0.05 \\Longrightarrow\\) Não rejeita \\(H_0\\)\n\nCondutividade (\\(\\alpha = 0.01\\))\n\n\\(p_2 \\approx 0.0029 &gt; 0.01 \\Longrightarrow\\) Rejeita \\(H_0\\)\n\n\n\n\nQuestão F\nInterpretação: - pH: Não há evidência suficiente para rejeitar a afirmação de nível médio 6.8. - Condutividade: Há evidência suficiente para rejeitar a afirmação de média 1890 mg/L."
+  }
+]
