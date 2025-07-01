@@ -1901,7 +1901,7 @@ x = \mu + \sigma \cdot z
 </section>
 <section id="exercício-24" class="level2">
 <h2 class="anchored" data-anchor-id="exercício-24">Exercício 24</h2>
-<p>O problema apresentado neste exercíciio é mais simples por poder ser reduzido a um vetor tal que:</p>
+<p>O problema apresentado neste exercício é mais simples por poder ser reduzido a um vetor tal que:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>hours <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">26</span>, <span class="dv">25</span>, <span class="dv">32</span>, <span class="dv">31</span>, <span class="dv">28</span>, <span class="dv">28</span>,</span>
@@ -1997,7 +1997,7 @@ x = \mu + \sigma \cdot z
 <p><span class="math display">\[ \sigma = 7.9 \]</span> <span class="math display">\[ E = 2 \]</span> <span class="math display">\[ \alpha = 0.05 \]</span> <span class="math display">\[ z_c = 1.959964 \]</span></p>
 <p>Dadas estas informações, podemos obter:</p>
 <p><span class="math display">\[
-  n = (z_c \cdot sigma / E)^2
+  n = (z_c \cdot \sigma / E)^2
 \]</span></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">ceiling</span>((z_c <span class="sc">*</span> sigma <span class="sc">/</span> E)<span class="sc">^</span><span class="dv">2</span>)</span>
@@ -2208,9 +2208,6 @@ $s
 </section>
 <section id="exercício-33" class="level2">
 <h2 class="anchored" data-anchor-id="exercício-33">Exercício 33</h2>
-<ol start="33" type="1">
-<li>Use os dados do exercício 32 para construir um intervalo de confiança de 90% para a proporção populacional de professores americanos que disseram que “todas ou quase todas” as informações que eles encontram utilizando ferramentas de busca on-line são corretas ou confiáveis.</li>
-</ol>
 <section id="questão-a-21" class="level3">
 <h3 class="anchored" data-anchor-id="questão-a-21">Questão A</h3>
 <div class="cell">
@@ -2227,7 +2224,7 @@ $s
 <div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a>np  <span class="ot">&lt;-</span> n <span class="sc">*</span> p_h</span>
 <span id="cb157-2"><a href="#cb157-2" aria-hidden="true" tabindex="-1"></a>nq  <span class="ot">&lt;-</span> n <span class="sc">*</span> q_h</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>A distribuição amostral pode ser aproximada por uma distribuição normal pois $ np = 123 nq = 2339 $.</p>
+<p>A distribuição amostral pode ser aproximada por uma distribuição normal pois <span class="math inline">\(np = 123 \gt 5 \land nq = 2339 \gt 5\)</span>.</p>
 </section>
 <section id="questão-c-16" class="level3">
 <h3 class="anchored" data-anchor-id="questão-c-16">Questão C</h3>
@@ -2275,7 +2272,7 @@ $s
 <div class="sourceCode cell-code" id="cb164"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb164-1"><a href="#cb164-1" aria-hidden="true" tabindex="-1"></a>np  <span class="ot">&lt;-</span> n <span class="sc">*</span> p_h</span>
 <span id="cb164-2"><a href="#cb164-2" aria-hidden="true" tabindex="-1"></a>nq  <span class="ot">&lt;-</span> n <span class="sc">*</span> q_h</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>A amostra pode ser aproximada pela distribuição normal dado que $ np = 124.5 nq = 373.5 $.</p>
+<p>Tamém podemos aproximar pela distribuição normal dado que <span class="math inline">\(np = 124.5 \gt 5 \land nq = 373.5 \gt 5\)</span>.</p>
 </section>
 <section id="questão-c-17" class="level3">
 <h3 class="anchored" data-anchor-id="questão-c-17">Questão C</h3>
@@ -2332,7 +2329,7 @@ $s
 <div class="sourceCode cell-code" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a>n1 <span class="ot">&lt;-</span> <span class="fu">ceiling</span>(n1)</span>
 <span id="cb169-2"><a href="#cb169-2" aria-hidden="true" tabindex="-1"></a>n2 <span class="ot">&lt;-</span> <span class="fu">ceiling</span>(n2)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Sem estimativa prévia, precisa-se de 1691 pessoas Com <span class="math inline">\(\hat{p} = 0.31\)</span>, precisa-se de 1447 pessoas</p>
+<p>Sem estimativa prévia, precisa-se de 1691 pessoas Com <span class="math inline">\(\hat{p} = 0.31\)</span>, precisa-se de 1447 pessoas.</p>
 </section>
 </section>
 <section id="exercício-36" class="level2">
@@ -2634,9 +2631,6 @@ $s
 </section>
 <section id="exercício-42" class="level2">
 <h2 class="anchored" data-anchor-id="exercício-42">Exercício 42</h2>
-<ol start="42" type="1">
-<li>Você realiza um teste de hipótese para cada uma das afirmações. Como você deveria interpretar sua decisão se rejeitar H0? E se você não rejeitar H0? Ha (afirmação): Um corretor de imóveis divulga que a proporção de proprietários que acham suas casas muito pequenas para suas famílias é mais que 24%.</li>
-</ol>
 <section id="questão-a-29" class="level3">
 <h3 class="anchored" data-anchor-id="questão-a-29">Questão A</h3>
 <p>Se rejeitarmos <span class="math inline">\(H_0\)</span>, a interpretação seria de que há evidência suficiente para concluir que a proporção de proprietários que acham suas casas muito pequenas é maior que 24%.</p>
@@ -2648,9 +2642,6 @@ $s
 </section>
 <section id="exercício-43" class="level2">
 <h2 class="anchored" data-anchor-id="exercício-43">Exercício 43</h2>
-<ol start="43" type="1">
-<li>Encontre o valor p para um teste de hipótese unilateral à esquerda com uma estatística de teste padronizada z = –1,71. Decida se rejeita H0 quando o nível de significância é α = 0,05.</li>
-</ol>
 <section id="questão-a-30" class="level3">
 <h3 class="anchored" data-anchor-id="questão-a-30">Questão A</h3>
 <div class="cell">
@@ -3048,9 +3039,6 @@ $s
 </section>
 <section id="exercício-52" class="level2">
 <h2 class="anchored" data-anchor-id="exercício-52">Exercício 52</h2>
-<ol start="52" type="1">
-<li>Encontre os valores críticos –t0 e t0 para um teste bilateral para α = 0,05 e n = 16.</li>
-</ol>
 <section id="questão-a-38" class="level3">
 <h3 class="anchored" data-anchor-id="questão-a-38">Questão A</h3>
 <p><span class="math display">\[gl = n - 1 = 16 - 1 = 15\]</span></p>
@@ -3146,7 +3134,7 @@ $s
 </section>
 <section id="questão-e-5" class="level3">
 <h3 class="anchored" data-anchor-id="questão-e-5">Questão E</h3>
-<p><span class="math display">\[ p \approx 0.044 &lt; \alpha = 0.1 \Longrightarrow \text{ Rejeita } H_0\]</span></p>
+<p><span class="math display">\[ p \approx 0.044 &lt; \alpha = 0.1 \Longrightarrow \text{ Rejeitar } H_0\]</span></p>
 </section>
 <section id="questão-f-2" class="level3">
 <h3 class="anchored" data-anchor-id="questão-f-2">Questão F</h3>
@@ -3155,118 +3143,95 @@ $s
 </section>
 <section id="exercício-54" class="level2">
 <h2 class="anchored" data-anchor-id="exercício-54">Exercício 54</h2>
-<ol start="54" type="1">
-<li>Uma indústria afirma que o nível médio do pH da água em um rio próximo é de 6,8. Você seleciona aleatoriamente 39 amostras de água e mede o pH de cada uma. A média amostral e o desvio padrão são de 6,7 e 0,35, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando nível de significância α = 0,05?</li>
-</ol>
-<p>Esta mesma indústria afirma que a condutividade média do rio é de 1.890 mg/l. A condutividade de uma amostra de água é uma medida do total de sólidos dissolvidos na amostra. Você seleciona aleatoriamente 39 amostras de água e mede a condutividade de cada uma. A média e o desvio padrão amostral são de 2.350 mg/l e 900 mg/l, respectivamente. Há evidência suficiente para rejeitar a afirmação da indústria considerando o nível de significância α = 0,01?</p>
 <section id="questão-a-40" class="level3">
 <h3 class="anchored" data-anchor-id="questão-a-40">Questão A</h3>
 <section id="ph" class="level4">
 <h4 class="anchored" data-anchor-id="ph">pH</h4>
 <ul>
-<li><span class="math display">\[ H_0: \mu_{pH} &amp;= 6.8 \]</span></li>
-<li><span class="math display">\[ H_a: \mu_{pH} &amp;\neq 6.8 \]</span></li>
+<li><span class="math inline">\(H_0: \mu_{pH} = 6.8\)</span></li>
+<li><span class="math inline">\(H_a: \mu_{pH} \neq 6.8\)</span></li>
 </ul>
 </section>
 <section id="condutividade" class="level4">
 <h4 class="anchored" data-anchor-id="condutividade">Condutividade</h4>
 <ul>
-<li><span class="math display">\[ H_0: \mu_{cond} &amp;= 1890 \]</span></li>
-<li><span class="math display">\[ H_a: \mu_{cond} &amp;\neq 1890 \]</span></li>
+<li><span class="math inline">\(H_0: \mu_{cond} = 1890\)</span></li>
+<li><span class="math inline">\(H_a: \mu_{cond} \neq 1890\)</span></li>
 </ul>
 </section>
 </section>
 <section id="questão-b-40" class="level3">
 <h3 class="anchored" data-anchor-id="questão-b-40">Questão B</h3>
 <ul>
-<li><span class="math display">\[ \text{pH: }&amp;\alpha = 0.05,\quad df = 39 - 1 = 38 \]</span></li>
-<li><span class="math display">\[ \text{Cond: }&amp;\alpha = 0.01,\quad df = 39 - 1 = 38 \]</span></li>
+<li>pH: <span class="math inline">\(\alpha = 0.05,\quad df = 39 - 1 = 38\)</span></li>
+<li>Condutividade: <span class="math inline">\(\alpha = 0.01,\quad df = 39 - 1 = 38\)</span></li>
 </ul>
 </section>
 <section id="questão-c-32" class="level3">
 <h3 class="anchored" data-anchor-id="questão-c-32">Questão C</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb222"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb222-1"><a href="#cb222-1" aria-hidden="true" tabindex="-1"></a>df    <span class="ot">&lt;-</span> <span class="dv">38</span></span>
+<div class="sourceCode cell-code" id="cb222"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb222-1"><a href="#cb222-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="dv">38</span></span>
 <span id="cb222-2"><a href="#cb222-2" aria-hidden="true" tabindex="-1"></a>t_crit05 <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>, df)</span>
-<span id="cb222-3"><a href="#cb222-3" aria-hidden="true" tabindex="-1"></a>t_crit01 <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.01</span> <span class="sc">/</span> <span class="dv">2</span>, df)</span>
-<span id="cb222-4"><a href="#cb222-4" aria-hidden="true" tabindex="-1"></a>t_crit05; <span class="sc">-</span>t_crit05</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2.024394</code></pre>
+<span id="cb222-3"><a href="#cb222-3" aria-hidden="true" tabindex="-1"></a>t_crit01 <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.01</span> <span class="sc">/</span> <span class="dv">2</span>, df)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] -2.024394</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb225"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb225-1"><a href="#cb225-1" aria-hidden="true" tabindex="-1"></a><span class="co"># [1]  2.024394 -2.024394</span></span>
-<span id="cb225-2"><a href="#cb225-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb225-3"><a href="#cb225-3" aria-hidden="true" tabindex="-1"></a>t_crit01; <span class="sc">-</span>t_crit01</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2.711558</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] -2.711558</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb228"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb228-1"><a href="#cb228-1" aria-hidden="true" tabindex="-1"></a><span class="co"># [1]  2.715158 -2.715158</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p><span class="math display">\[ t_crit05 = 2.0243942 \]</span> <span class="math display">\[ t_crit01 = 2.7115576 \]</span></p>
 </section>
 <section id="questão-d-21" class="level3">
 <h3 class="anchored" data-anchor-id="questão-d-21">Questão D</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb229"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb229-1"><a href="#cb229-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pH</span></span>
-<span id="cb229-2"><a href="#cb229-2" aria-hidden="true" tabindex="-1"></a>xbar1 <span class="ot">&lt;-</span> <span class="fl">6.7</span></span>
-<span id="cb229-3"><a href="#cb229-3" aria-hidden="true" tabindex="-1"></a>mu01  <span class="ot">&lt;-</span> <span class="fl">6.8</span></span>
-<span id="cb229-4"><a href="#cb229-4" aria-hidden="true" tabindex="-1"></a>s1    <span class="ot">&lt;-</span> <span class="fl">0.35</span></span>
-<span id="cb229-5"><a href="#cb229-5" aria-hidden="true" tabindex="-1"></a>n1    <span class="ot">&lt;-</span> <span class="dv">39</span></span>
-<span id="cb229-6"><a href="#cb229-6" aria-hidden="true" tabindex="-1"></a>df    <span class="ot">&lt;-</span> n1 <span class="sc">-</span> <span class="dv">1</span></span>
-<span id="cb229-7"><a href="#cb229-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb229-8"><a href="#cb229-8" aria-hidden="true" tabindex="-1"></a>t1    <span class="ot">&lt;-</span> (xbar1 <span class="sc">-</span> mu01) <span class="sc">/</span> (s1 <span class="sc">/</span> <span class="fu">sqrt</span>(n1))</span>
-<span id="cb229-9"><a href="#cb229-9" aria-hidden="true" tabindex="-1"></a>p1    <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t1), df)</span>
-<span id="cb229-10"><a href="#cb229-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb229-11"><a href="#cb229-11" aria-hidden="true" tabindex="-1"></a><span class="co"># condutividade</span></span>
-<span id="cb229-12"><a href="#cb229-12" aria-hidden="true" tabindex="-1"></a>xbar2 <span class="ot">&lt;-</span> <span class="dv">2350</span></span>
-<span id="cb229-13"><a href="#cb229-13" aria-hidden="true" tabindex="-1"></a>mu02  <span class="ot">&lt;-</span> <span class="dv">1890</span></span>
-<span id="cb229-14"><a href="#cb229-14" aria-hidden="true" tabindex="-1"></a>s2    <span class="ot">&lt;-</span> <span class="dv">900</span></span>
-<span id="cb229-15"><a href="#cb229-15" aria-hidden="true" tabindex="-1"></a>n2    <span class="ot">&lt;-</span> <span class="dv">39</span></span>
-<span id="cb229-16"><a href="#cb229-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb229-17"><a href="#cb229-17" aria-hidden="true" tabindex="-1"></a>t2    <span class="ot">&lt;-</span> (xbar2 <span class="sc">-</span> mu02) <span class="sc">/</span> (s2 <span class="sc">/</span> <span class="fu">sqrt</span>(n2))</span>
-<span id="cb229-18"><a href="#cb229-18" aria-hidden="true" tabindex="-1"></a>p2    <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t2), df)</span>
-<span id="cb229-19"><a href="#cb229-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb229-20"><a href="#cb229-20" aria-hidden="true" tabindex="-1"></a>t1; p1</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] -1.784285</code></pre>
+<div class="sourceCode cell-code" id="cb223"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb223-1"><a href="#cb223-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pH</span></span>
+<span id="cb223-2"><a href="#cb223-2" aria-hidden="true" tabindex="-1"></a>xbar1 <span class="ot">&lt;-</span> <span class="fl">6.7</span></span>
+<span id="cb223-3"><a href="#cb223-3" aria-hidden="true" tabindex="-1"></a>mu01 <span class="ot">&lt;-</span> <span class="fl">6.8</span></span>
+<span id="cb223-4"><a href="#cb223-4" aria-hidden="true" tabindex="-1"></a>s1 <span class="ot">&lt;-</span> <span class="fl">0.35</span></span>
+<span id="cb223-5"><a href="#cb223-5" aria-hidden="true" tabindex="-1"></a>n1 <span class="ot">&lt;-</span> <span class="dv">39</span></span>
+<span id="cb223-6"><a href="#cb223-6" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> n1 <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb223-7"><a href="#cb223-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-8"><a href="#cb223-8" aria-hidden="true" tabindex="-1"></a>t1 <span class="ot">&lt;-</span> (xbar1 <span class="sc">-</span> mu01) <span class="sc">/</span> (s1 <span class="sc">/</span> <span class="fu">sqrt</span>(n1))</span>
+<span id="cb223-9"><a href="#cb223-9" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t1), df)</span>
+<span id="cb223-10"><a href="#cb223-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-11"><a href="#cb223-11" aria-hidden="true" tabindex="-1"></a><span class="co"># condutividade</span></span>
+<span id="cb223-12"><a href="#cb223-12" aria-hidden="true" tabindex="-1"></a>xbar2 <span class="ot">&lt;-</span> <span class="dv">2350</span></span>
+<span id="cb223-13"><a href="#cb223-13" aria-hidden="true" tabindex="-1"></a>mu02 <span class="ot">&lt;-</span> <span class="dv">1890</span></span>
+<span id="cb223-14"><a href="#cb223-14" aria-hidden="true" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> <span class="dv">900</span></span>
+<span id="cb223-15"><a href="#cb223-15" aria-hidden="true" tabindex="-1"></a>n2 <span class="ot">&lt;-</span> <span class="dv">39</span></span>
+<span id="cb223-16"><a href="#cb223-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-17"><a href="#cb223-17" aria-hidden="true" tabindex="-1"></a>t2 <span class="ot">&lt;-</span> (xbar2 <span class="sc">-</span> mu02) <span class="sc">/</span> (s2 <span class="sc">/</span> <span class="fu">sqrt</span>(n2))</span>
+<span id="cb223-18"><a href="#cb223-18" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t2), df)</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.08236385</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb232"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb232-1"><a href="#cb232-1" aria-hidden="true" tabindex="-1"></a><span class="co"># t1 ≈ -1.786, p1 ≈ 0.081</span></span>
-<span id="cb232-2"><a href="#cb232-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb232-3"><a href="#cb232-3" aria-hidden="true" tabindex="-1"></a>t2; p2</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.191888</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.002835512</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb235"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb235-1"><a href="#cb235-1" aria-hidden="true" tabindex="-1"></a><span class="co"># t2 ≈ 3.190,  p2 ≈ 0.0029</span></span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p><span class="math display">\[ t_1 = -1.7842851 \]</span> <span class="math display">\[ p_1 = 0.0823639 \]</span></p>
+<p><span class="math display">\[ t_2 = 3.1918879 \]</span> <span class="math display">\[ p_2 = 0.0028355 \]</span></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Código</summary>
-<div class="sourceCode cell-code" id="cb236"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb236-1"><a href="#cb236-1" aria-hidden="true" tabindex="-1"></a>pairs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="at">length.out =</span> <span class="dv">400</span>))</span>
-<span id="cb236-2"><a href="#cb236-2" aria-hidden="true" tabindex="-1"></a>pairs<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">dt</span>(pairs<span class="sc">$</span>x, <span class="at">df =</span> df)</span>
-<span id="cb236-3"><a href="#cb236-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb236-4"><a href="#cb236-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pairs, <span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
-<span id="cb236-5"><a href="#cb236-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb236-6"><a href="#cb236-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">c</span>(<span class="sc">-</span>t_crit05, t_crit05, t1),</span>
-<span id="cb236-7"><a href="#cb236-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
-<span id="cb236-8"><a href="#cb236-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"red"</span>,<span class="st">"darkgreen"</span>)) <span class="sc">+</span></span>
-<span id="cb236-9"><a href="#cb236-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> t1, <span class="at">y =</span> <span class="fu">max</span>(pairs<span class="sc">$</span>y) <span class="sc">*</span> <span class="fl">0.7</span>,</span>
-<span id="cb236-10"><a href="#cb236-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"t1="</span>, <span class="fu">round</span>(t1, <span class="dv">3</span>)),</span>
-<span id="cb236-11"><a href="#cb236-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb236-12"><a href="#cb236-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Teste t bilateral para pH"</span>,</span>
-<span id="cb236-13"><a href="#cb236-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">"t1 ="</span>, <span class="fu">round</span>(t1, <span class="dv">3</span>),</span>
-<span id="cb236-14"><a href="#cb236-14" aria-hidden="true" tabindex="-1"></a>                        <span class="st">" | região de rejeição |t| &gt; 2.0244"</span>),</span>
-<span id="cb236-15"><a href="#cb236-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"t"</span>, <span class="at">y =</span> <span class="st">"f(t)"</span>) <span class="sc">+</span></span>
-<span id="cb236-16"><a href="#cb236-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb224"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb224-1"><a href="#cb224-1" aria-hidden="true" tabindex="-1"></a>pairs <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="at">length.out =</span> <span class="dv">400</span>))</span>
+<span id="cb224-2"><a href="#cb224-2" aria-hidden="true" tabindex="-1"></a>pairs<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">dt</span>(pairs<span class="sc">$</span>x, <span class="at">df =</span> df)</span>
+<span id="cb224-3"><a href="#cb224-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb224-4"><a href="#cb224-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pairs, <span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
+<span id="cb224-5"><a href="#cb224-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb224-6"><a href="#cb224-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">c</span>(<span class="sc">-</span>t_crit05, t_crit05, t1),</span>
+<span id="cb224-7"><a href="#cb224-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb224-8"><a href="#cb224-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"red"</span>, <span class="st">"darkgreen"</span>)</span>
+<span id="cb224-9"><a href="#cb224-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb224-10"><a href="#cb224-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> t1, <span class="at">y =</span> <span class="fu">max</span>(pairs<span class="sc">$</span>y) <span class="sc">*</span> <span class="fl">0.7</span>,</span>
+<span id="cb224-11"><a href="#cb224-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"t1="</span>, <span class="fu">round</span>(t1, <span class="dv">3</span>)),</span>
+<span id="cb224-12"><a href="#cb224-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"darkgreen"</span></span>
+<span id="cb224-13"><a href="#cb224-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb224-14"><a href="#cb224-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Teste t bilateral para pH"</span>,</span>
+<span id="cb224-15"><a href="#cb224-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">"t1 ="</span>, <span class="fu">round</span>(t1, <span class="dv">3</span>),</span>
+<span id="cb224-16"><a href="#cb224-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">" | região de rejeição |t| &gt; 2.0244"</span>),</span>
+<span id="cb224-17"><a href="#cb224-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"t"</span></span>
+<span id="cb224-18"><a href="#cb224-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb224-19"><a href="#cb224-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb224-20"><a href="#cb224-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb224-21"><a href="#cb224-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">l =</span> <span class="sc">-</span><span class="dv">45</span>, <span class="at">t =</span> <span class="dv">10</span>, <span class="at">b =</span> <span class="dv">5</span>)),</span>
+<span id="cb224-22"><a href="#cb224-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">l =</span> <span class="sc">-</span><span class="dv">45</span>, <span class="at">t =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">25</span>)),</span>
+<span id="cb224-23"><a href="#cb224-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(</span>
+<span id="cb224-24"><a href="#cb224-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">0</span>, <span class="at">r =</span> <span class="dv">15</span>, <span class="at">b =</span> <span class="dv">0</span>, <span class="at">l =</span> <span class="dv">10</span>, <span class="at">unit =</span> <span class="st">"pt"</span>)</span>
+<span id="cb224-25"><a href="#cb224-25" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb224-26"><a href="#cb224-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(</span>
+<span id="cb224-27"><a href="#cb224-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">15</span>, <span class="at">r =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">0</span>, <span class="at">l =</span> <span class="dv">0</span>, <span class="at">unit =</span> <span class="st">"pt"</span>)</span>
+<span id="cb224-28"><a href="#cb224-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb224-29"><a href="#cb224-29" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copiar para a área de transferência" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -3282,17 +3247,23 @@ $s
 <ul>
 <li>pH (<span class="math inline">\(\alpha = 0.05\)</span>)
 <ul>
-<li><span class="math inline">\(p_1 \approx 0.081 &gt; 0.05 \Longrightarrow\)</span> Não rejeita <span class="math inline">\(H_0\)</span></li>
+<li><span class="math inline">\(p_1 \approx 0.081 &gt; 0.05 \Longrightarrow\)</span> Não rejeitar <span class="math inline">\(H_0\)</span></li>
 </ul></li>
 <li>Condutividade (<span class="math inline">\(\alpha = 0.01\)</span>)
 <ul>
-<li><span class="math inline">\(p_2 \approx 0.0029 &gt; 0.01 \Longrightarrow\)</span> Rejeita <span class="math inline">\(H_0\)</span></li>
+<li><span class="math inline">\(p_2 \approx 0.0029 &gt; 0.01 \Longrightarrow\)</span> Rejeitar <span class="math inline">\(H_0\)</span></li>
 </ul></li>
 </ul>
 </section>
 <section id="questão-f-3" class="level3">
 <h3 class="anchored" data-anchor-id="questão-f-3">Questão F</h3>
-<p><strong>Interpretação:</strong> - pH: Não há evidência suficiente para rejeitar a afirmação de nível médio 6.8. - Condutividade: Há evidência suficiente para rejeitar a afirmação de média 1890 mg/L.</p>
+<ul>
+<li><strong>Interpretação:</strong>
+<ul>
+<li>pH: Não há evidência suficiente para rejeitar a afirmação de nível médio 6.8</li>
+<li>Condutividade: Há evidência suficiente para rejeitar a afirmação de média 1890 mg/L</li>
+</ul></li>
+</ul>
 
 
 </section>
