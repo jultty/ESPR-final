@@ -53,7 +53,7 @@ exp(1i * pi) + 1
 
 Para manter a consistência com as saídas computacionais, neste trabalho utilizou-se exclusivamente o ponto como marcador de casas decimais.
 
-## Funções Utilitárias
+## Funções Auxiliares
 
 Primeiro, podemos definir algumas funções auxiliares que serão úteis ao longo de todo o trabalho.
 

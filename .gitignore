@@ -1,5 +1,8 @@
+/.quarto/
+/_site
+/index_cache
+/index_files
 L2_cache
 L2_files
 .RData
 .Rhistory
-/.quarto/
